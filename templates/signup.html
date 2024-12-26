@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/output.css">
+    <title>Signup</title>
+</head>
+<body class="bg-gradient-to-b from-emerald-50 to-emerald-400">
+
+    <div class="min-h-screen flex flex-col justify-center items-center m-5">
+        <div id="full-form" class="bg-white rounded-lg shadow-lg shadow-gray-900 md:w-1/2 lg:w-1/3">
+            
+            <div id="form" class="font-mono italic flex flex-col gap-2 p-10">
+                <div id="heading-div" class="text-center">
+                    <h1 class="text-xl text-indigo-500 font-bold italic  sm:text-xl lg:text-3xl">Signup</h1>
+                    <span class="text-xs font-bold sm:text-md lg:text-lg ">Empowering your education journey!</span>    
+                </div>
+
+                <!-- Error Message Section -->
+                {% if error_message %}
+                    <div id="error-div" class="text-center text-sm text-red-600 font-semibold italic sm:text-lg">
+                        <p>{{error_message}}</p>
+                    </div>
+                {% endif %}
+                <form method="post" class="grid grid-cols-1 gap-3 mt-3">
+                    <div class="flex flex-col gap-0.5" id="email_id-div">
+                        <label for="email_id">Email Id</label>
+                        <input required autofocus type="email" name="email_id" id="father_name" placeholder="nagarjun1@gmail.com"
+                            class="rounded-lg border-2 border-indigo-500  focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md"
+                            value = "{{ email_id | default('') }}">
+                    </div>
+                    
+                    <div class="flex flex-col gap-0.5" id="username-div">
+                        <label for="username">Username</label>
+                        <input required type="text" name="username" id="father_name" placeholder="Nagarjun" 
+                            class="rounded-lg border-2 border-indigo-500  focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md"
+                            value="{{ username | default('') }}">
+                    </div>
+
+                    <div class="flex flex-col gap-0.5" id="password-div">
+                        <label for="password">Password</label>
+                        <input required type="password" name="password" id="father_name" placeholder="Enter password" 
+                            class="rounded-lg border-2 border-indigo-500  focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                    </div>
+
+                    <div class="flex flex-col gap-0.5" id="confirm_password-div">
+                        <label for="confirm_password">Confirm Password</label>
+                        <input required type="password" name="confirm_password" id="father_name" placeholder="Enter confirm password" 
+                            class="rounded-lg border-2 border-indigo-500  focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                    </div>
+                    
+
+                    <div class="flex flex-col mt-3">
+                        <button class=" bg-indigo-500 text-white rounded-lg px-14 py-3" type="submit">Submit</button>
+                    </div>
+                    
+                </form>
+
+                <div id="suggestion-div" class="flex flex-col text-center text-sm gap-2 mt-2 sm:text-lg">
+                    <span class="font-semibold italic">Already have an account <a class="px-1 text-indigo-500" href="/signin">Signin</a></span>
+                </div>
+        </div>
+    </div>
+
+</body>
+</html>
+
+

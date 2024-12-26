@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Personal Details{% endblock %}
+
+{% block content %}
+
+    <div class="min-h-screen flex flex-col justify-center items-center m-5 mt-20">
+        {% if filled %}
+            <div>
+                <p>Already filled your Personal details</p>
+            </div>
+        {% else %}
+        
+        <div id="full-form" class="bg-white rounded-lg shadow-lg shadow-gray-900 lg:w-1/2">
+            <div id="form" class="font-mono italic flex flex-col gap-2 p-10">
+                <div id="heading-div">
+                    <!-- <h1 class="text-xl text-indigo-500 font-bold italic text-center sm:text-xl lg:text-2xl">Personal Details</h1> -->
+                    <h1 class="text-xl text-gray-900 font-bold font-serif  text-center sm:text-xl lg:text-2xl">Personal Details</h1>
+                </div>
+
+                {% if error_message %}
+                <div id="error-div" class="text-center text-sm text-red-600 font-semibold italic sm:text-lg">
+                    <p>{{error_message}}</p>
+                </div>
+                {% endif %}
+                
+                <form method="post" enctype="multipart/form-data" class="grid grid-cols-1 mt-2 gap-2 sm:grid sm:grid-cols-2 sm:gap-3">
+
+                    <div class="flex flex-col gap-0.5" id="initial-div">
+                        <label for="initial">Initial</label>
+                        <input required type="text" name="initial" id="initial" placeholder="RP" class="rounded-lg focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                    </div>
+
+                    <div class="flex flex-col gap-0.5" id="name-div">
+                        <label for="name">Full Name</label>
+                        <input required type="text" name="name" id="name" placeholder="Nagarjun" class="rounded-lg focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                    </div>
+
+                    <div class="flex flex-col gap-0.5" aria-colcount="name-as-in-passbook-div">
+                        <label for="name_as_in_passbook">Name as in Passbook</label>
+                        <input required type="text" name="name_as_in_passbook" id="name_as_in_passbook" placeholder="Nagarjun Ramakrishnan" class="rounded-lg focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md ">
+                    </div>
+                    
+                    <div class="flex flex-col gap-0.5" id="gender">
+                        <label for="gender">Gender</label>
+                        <select name="gender" id="gender"  class="rounded-lg focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex flex-col gap-0.5" id="gheru_naav-div">
+                        <label for="gheru_naav" class="text-md">Gheru Naav</label>
+                        <input required  type="text" name="gheru_naav" id="gheru_naav" placeholder="Girim" class="rounded-lg focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                    </div>
+                    
+                    <div class="flex flex-col gap-0.5" id="aadhar_num-div">
+                        <label for="aadhar_num">Aadhar Number</label>
+                        <input required type="number" name="aadhar_num" id="aadhar_num" placeholder="************" class="rounded-lg focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                    </div>
+
+                    <div class="flex flex-col gap-0.5" id="date_of_birth-div">
+                        <label for="date_of_birth">Date of Birth</label>
+                        <input required type="date" name="date_of_birth" id="date_of_birth" class="rounded-lg focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                    </div>
+
+                    <div class="flex flex-col gap-0.5" id="phone_num-div">
+                        <label for="phone_num">Phone Number</label>
+                        <input required type="number" name="phone_num" id="phone_num" placeholder="1234567890" class="rounded-lg focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                    </div>
+    
+                    <div class="flex flex-col gap-2" id="passport_size_pic-div">
+                        <label for="passport_size_pic">Passport Photo</label>
+                        <input required type="file" name="passport_size_pic" id="passport_size_pic" accept="image/*" class="">
+                    </div>
+                    <div class="flex flex-col mt-3 sm:mt-4 sm:col-span-2">
+                        <button class="bg-indigo-500 text-white rounded-lg px-14 py-3" type="submit">Submit</button>
+                    </div>
+                </form>
+
+        </div>
+    </div>    
+    {% endif %}
+{% endblock %}

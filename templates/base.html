@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %} SETN {% endblock %}</title>
+  <link rel="stylesheet" href="../static/output.css">
+</head>
+<body class="font-mono">
+  <!-- Navbar -->
+  <header class="bg-white shadow-md fixed w-full top-0 left-0 z-10">
+    <div class="grid grid-cols-2 md:grid-cols-3 items-center gap-4 p-4">
+      <!-- Logo -->
+      <div>
+        <a href="#" class="text-2xl font-bold text-indigo-600">SETN</a>
+      </div>
+
+      <!-- Desktop Navigation Links -->
+      <nav class="hidden md:flex md:justify-center space-x-6">
+        {% if user and user.role == 'beneficiary' %}
+        <a href="/personal_details" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700">Personal</a>
+        <a href="/parental_details" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700">Parent</a>
+        <a href="/educational_details" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700">Education</a>
+        <a href="/financial_assistance_application" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700">Application</a>
+        
+        {% else %}
+        <a href="/admin/all_applications" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700">Applications</a>
+        <a href="/admin/beneficiaries" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700">Beneficiaries</a>
+        <a href="#" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700">Dashboard</a>
+        {% endif %}
+      </nav>
+      
+
+      <!-- Desktop Buttons -->
+      <div class="hidden md:flex md:justify-end space-x-4">
+        {% if user %}
+        <form method="post" action="/signout" enctype="application/x-www-form-urlencoded" class="flex flex-col">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button type="submit" class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600">Logout</button>
+        </form>   
+        {% else %}
+        <a href="/signup" class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600">Sign Up</a>
+        <a href="/signin" class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600">Sign In</a>   
+        {% endif %}
+      </div>
+
+      <!-- Mobile Menu Button -->
+      <div class="flex md:hidden justify-end">
+        <button id="menu-button" class="text-gray-600 focus:outline-none">
+          <img src="../static/menu.png" alt="Menu Icon" class="h-6 w-6 object-contain">
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Dropdown Menu -->
+    <div
+      id="mobile-menu"
+      class="hidden absolute top-full left-0 w-full bg-white border-t border-gray-200 shadow-md"
+    >
+      <nav class="p-4 space-y-4 text-center">
+        
+        {% if user and user.role == 'beneficiary' %}
+        <a href="/personal_details" class="block text-emerald-600">Personal</a>
+        <a href="/parental_details" class="block text-emerald-600">Parent</a>
+        <a href="/educational_details" class="block text-emerald-600">Education</a>
+        <a href="/financial_assistance_application" class="block text-emerald-600">Application</a>
+        {% else %}
+        <a href="/admin/all_applications" class="block text-emerald-600">Applications</a>
+        <a href="/admin/beneficiaries" class="block text-emerald-600">Beneficiaries</a>
+        <a href="#" class="block text-emerald-600">Dashboard</a>
+        {% endif %}
+
+        {% if user %}
+        <form method="post" action="/signout" class="flex flex-col">
+            <button type="submit" class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600">Logout</button>
+        </form>        
+        {% else %}
+        <a href="/signup" class="block bg-indigo-500 text-white py-2 rounded-lg text-center hover:bg-indigo-600">Sign Up</a>
+        <a href="/signin" class="block bg-indigo-500 text-white py-2 rounded-lg text-center hover:bg-indigo-600">Sign In</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <!-- Toggle Script -->
+  <script>
+    document.getElementById('menu-button').addEventListener('click', () => {
+      const mobileMenu = document.getElementById('mobile-menu');
+      mobileMenu.classList.toggle('hidden');
+    });
+  </script>
+
+  <!-- Main Content -->
+  <main class="p-4 bg-gradient-to-b from-emerald-50 to-emerald-600">
+    {% block content %}
+    <!-- Page-specific content will go here -->
+    {% endblock %}
+  </main>
+</body>
+</html>

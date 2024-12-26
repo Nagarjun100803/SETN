@@ -169,3 +169,10 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+static/node_modules
+static/*.js
+static/*.json 
+
+notebooks
+tables.txt
