@@ -11,7 +11,7 @@
         </div>
         {% else %}
  
-        <div id="full-form" class="bg-white rounded-lg shadow-lg shadow-gray-900 lg:w-1/2 lg:rounded-2xl">
+        <div id="full-form" class="bg-slate-50 rounded-lg shadow-lg shadow-gray-900 lg:w-1/2 lg:rounded-2xl">
             
             <div id="form" class="font-mono italic flex flex-col gap-2 p-10">
                 <div id="heading-div">
@@ -25,38 +25,38 @@
                     <div class="flex flex-col gap-0.5" id="tenth_perc-div">
                         <label for="tenth_perc">Tenth Percentage</label>
                         <input required type="number" name="tenth_perc" min="50" max="100" step="0.01" oninput="validateRange(this)" placeholder="76.90" id="tenth_perc" pattern="" 
-                            class="rounded-lg border-2 border-indigo-500 focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                            class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
                     </div>
 
                     <div class="flex flex-col gap-0.5" id="eleventh_perc-div">
                         <label for="eleventh_perc">Eleventh Percentage</label>
                         <input required type="number" name="eleventh_perc"  min="50" max="100" step="0.01" oninput="validateRange(this)" placeholder="72.98" id="eleventh_perc" pattern="d{2}.d{2}" 
-                            class="rounded-lg border-2 border-indigo-500 focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                            class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
                     </div>
 
                     <div class="flex flex-col gap-0.5" id="twelveth_perc-div">
                         <label for="twelveth_perc">Twelveth Percentage</label>
                         <input required type="number"  min="50" max="100" step="0.01" oninput="validateRange(this)" placeholder="89.22" name="twelveth_perc" id="twelveth_perc" pattern="d{2}.d{2}" 
-                            class="rounded-lg border-2 border-indigo-500 focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md ">
+                            class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md ">
                     </div>
                     
                     <div class="flex flex-col gap-0.5" id="course-div">
                         <label for="course" class="text-md">Course</label>
-                        <select name="course" id="course" class="rounded-lg border-2 border-indigo-500 focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                        <select name="course" id="course" class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
                             <option value="">Select a Course</option>
                         </select>
                     </div>
                     
                     <div class="flex flex-col gap-0.5" id="degree-div">
                         <label for="degree">Degree</label>
-                        <select name="degree" id="degree" class="rounded-lg border-2 border-indigo-500 focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                        <select name="degree" id="degree" class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
                             <option value="">Select a Degree</option>
                         </select>
                     </div>
 
                     <div class="flex flex-col gap-0.5" id="department-div">
                         <label for="department">Department</label>
-                        <select name="department" id="department" class="rounded-lg border-2 border-indigo-500 focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                        <select name="department" id="department" class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
                             <option value="">Select a Department</option>
                         </select>
                     </div>
@@ -64,12 +64,12 @@
                     <div class="flex flex-col gap-0.5" id="college_name-div">
                         <label for="college_name">College Name</label>
                         <input required type="text" name="college_name" id="college_name" placeholder="Saurashstra College of Engineering" 
-                            class="rounded-lg border-2 border-indigo-500 focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                            class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
                     </div>
 
                     <div class="flex flex-col gap-0.5" id="college_type-div">
                         <label for="college_type">College Type</label>
-                        <select name="college_type" id="college_type" class="rounded-lg border-2 border-indigo-500 focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                        <select name="college_type" id="college_type" class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
                             <option value="Affiliated">Affiliated</option>
                             <option value="Autonomous">Autonomous</option>
                         </select>
@@ -78,13 +78,13 @@
                     <div class="flex flex-col gap-0.5" id="university-div">
                         <label for="university">University Name</label>
                         <input required type="text" name="university" id="pincode" placeholder="Anna University" 
-                            class="rounded-lg border-2 border-indigo-500 focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                            class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
                     </div>
     
                     <div class="flex flex-col gap-0.5" id="college_address-div">
                         <label for="college_address">College Address</label>
                         <input required type="text" name="college_address" id="pincode" placeholder="No.3 Madurai Main Road" 
-                            class="rounded-lg border-2 border-indigo-500 focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                            class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
                     </div>
 
                     <!-- File uploads -->
@@ -109,7 +109,7 @@
                     </div>
 
                     <div class="flex flex-col mt-3 sm:mt-4 sm:col-span-2">
-                        <button class=" bg-indigo-500 text-white rounded-lg px-14 py-3" type="submit">Submit</button>
+                        <button class=" bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg px-14 py-3" type="submit">Submit</button>
                     </div>
 
                 </form>

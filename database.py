@@ -84,7 +84,7 @@ def initate_database_tables():
             end_date date not null,
             place varchar,
             links varchar,
-            posted_at timestamp default 'now()'
+            posted_at timestamp not null default 'now()'
 
         );
 
@@ -94,11 +94,11 @@ def initate_database_tables():
             username varchar(100) not null,
             email_id varchar(100) not null unique,
             password varchar not null,
-            created_at timestamp default 'now()'
+            created_at timestamp not null default 'now()'
         );
 
         create table if not exists beneficiary_personal_details(
-            id integer references users(id), 
+            id integer references users(id) not null, 
             full_name varchar not null, 
             name_as_in_passbook varchar not null, 
             gender varchar(20) not null, 
@@ -106,11 +106,14 @@ def initate_database_tables():
             aadhar_num varchar(12) not null, 
             date_of_birth date not null, 
             phone_num varchar(10) not null, 
-            passport_size_pic bytea not null
+            passport_size_pic bytea not null,
+
+            remarks varchar,
+            is_verified boolean not null default false
         );
 
         create table if not exists beneficiary_parental_details(
-            id serial primary key,
+            id integer references users(id) not null,
             father_name varchar(100) not null,
             mother_name varchar(100) not null,
             father_occupation varchar(100) not null,
@@ -124,11 +127,11 @@ def initate_database_tables():
         );
 
         create table if not exists beneficiary_educational_details(
-            id serial primary key,
+            id integer references users(id) not null,
             tenth_perc numeric not null,
             eleventh_perc numeric not null,
             twelveth_perc numeric not null,
-            course_id integer references courses(id),
+            course_id integer references courses(id) not null,
             college_name varchar not null,
             college_type varchar(30) not null,
             university varchar(100) not null,
@@ -136,11 +139,22 @@ def initate_database_tables():
             tenth_marksheet bytea not null,
             eleventh_marksheet bytea,
             twelveth_marksheet bytea not null
-    );
+        );
+
+        create table if not exists application_periods(
+            id serial primary key,
+            academic_year varchar(30) not null,
+            semester varchar(30) not null,
+            start_date date not null,
+            end_date date not null,
+            opened_at timestamp not null default 'now()'
+        );
 
         create table if not exists financial_assistance_applications(
             id serial primary key,
             beneficiary_id integer references users(id),
+            application_period_id integer references application_periods(id) not null, 
+
             beneficiary_status varchar not null,
             parental_status varchar not null,
             total_annual_family_income varchar not null,
@@ -159,7 +173,9 @@ def initate_database_tables():
             previous_sem_marksheet bytea not null,
             bonafide_or_fee_paid_proof bytea,
 
-            applied_at timestamp default 'now()'
+            applied_at timestamp not null default 'now()',
+
+            unique(beneficiary_id, application_period_id)
         );
 
 
@@ -174,3 +190,4 @@ def initate_database_tables():
     execute_sql_commands(tables)
     print('Tables Setup done.')
  
+initate_database_tables()

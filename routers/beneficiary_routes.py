@@ -1,23 +1,21 @@
-from fastapi import APIRouter, Request, Response, Form, status, Depends
+from fastapi import APIRouter, Request, Response, Form, status, Depends, HTTPException
 from config import templates
 import schemas, utils
 from database import execute_sql_select_statement, execute_sql_commands
 from fastapi.responses import RedirectResponse
 from oauth2 import get_current_beneficiary
-from datetime import datetime, timedelta
 import pandas as pd
 
 
 
 router = APIRouter(tags = ['Beneficiary'])
 
-start_date = datetime(2024, 12, 9) 
-end_date = start_date + timedelta(20)
 
 
 course_sql: str = "select * from courses;"
 courses = execute_sql_select_statement(course_sql)
 course_df = pd.DataFrame(courses)
+
 
 
 def get_course_list():
@@ -34,7 +32,43 @@ def get_course_list():
     return final_data
 
 
- 
+def require_complete_profile(beneficiary: schemas.TokenData = Depends(get_current_beneficiary)) :
+    """
+        Ensures that the beneficiary's profile is complete before accessing the application endpoint.
+        Redirects to the respective profile section if details are missing.
+    """
+    sql: str = """
+        select 
+            (select id from beneficiary_personal_details where id = %(beneficiary_id)s) as personal_detail,
+            (select id from beneficiary_parental_details where id = %(beneficiary_id)s) as parental_detail,
+            (select id from beneficiary_educational_details where id = %(beneficiary_id)s) as educational_detail
+        ;
+    """
+
+
+    vars = {"beneficiary_id": beneficiary.id}
+    profile = execute_sql_select_statement(sql, vars, fetch_all = False)
+
+    if not profile['personal_detail']:
+        raise HTTPException(status_code = 307, headers = {"Location": "/personal_details"})
+    if not profile['parental_detail']:
+        raise HTTPException(status_code = 307, headers = {"Location": "/parental_details"})
+    if not profile['educational_detail']:
+        raise HTTPException(status_code = 307, headers = {"Location": "/educational_details"})
+
+
+def get_profile_status(beneficiary: schemas.TokenData = Depends(get_current_beneficiary)) -> bool:
+    sql: str = """select is_verified from beneficiary_personal_details where id = %(beneficiary_id)s;"""
+    profile = execute_sql_select_statement(sql, {'beneficiary_id': beneficiary.id}, fetch_all = False)
+
+    if (not profile) or (not profile["is_verified"]):
+        return False
+    return True
+     
+
+
+
+
 @router.get("/personal_details")
 def get_personal_details_page(
     request: Request,
@@ -92,29 +126,61 @@ def get_educational_details_page(
     return templates.TemplateResponse("educational_details.html", context)
 
 
+def get_application_period_data(beneficiary_id: int):
+    
+    application_period_sql: str = """
+        select 
+            *,
+            case
+                when end_date > now() then true  
+        -- return true if the current date is less than end_date else false
+                else false
+            end as status,
+        exists(  
+        -- using exists to check whether the user already applied for the application_period
+        -- return true if found a match else false.
+                select 
+                    id
+                from 
+                    financial_assistance_applications as fa
+                where 
+                    fa.application_period_id = application_periods.id and
+                    fa.beneficiary_id = %(beneficiary_id)s
+                
+            ) as previous_application
+        from 
+            application_periods
+        order by 
+            opened_at desc
+        limit 1
+        ;
+
+    """
+    application_period_data = execute_sql_select_statement(
+        application_period_sql, 
+        {"beneficiary_id": beneficiary_id}, 
+        fetch_all = False
+    ) 
+
+    # This is the formar of data {'id': 4, 'academic_year': '2024-2025', 'semester': 'even', 'start_date': datetime.date(2024, 12, 30), 'end_date': datetime.date(2025, 1, 30), 'opened_at': datetime.datetime(2024, 12, 31, 11, 50, 21, 763865), 'status': True, 'previous_application': True}
+    # print(application_period_data)
+    return application_period_data
+    
+
 @router.get("/financial_assistance_application")
 def get_financial_assistance_application_page(
     request: Request,
-    user: schemas.TokenData = Depends(get_current_beneficiary)
+    user: schemas.TokenData = Depends(get_current_beneficiary),
+    profile = Depends(require_complete_profile),
+    profile_status: bool = Depends(get_profile_status)
 ):
+    application_period_data = get_application_period_data(user.id)
+    context: dict = {"request": request, "user": user, "application_period": application_period_data, "message": None}
+
+    if not profile_status:
+        context.update({"message": "Your profile is not verified yet. Please wait for approval by the admin or contact them for assistance."})
     
-    existed_application_sql: str = """
-            select 
-                * 
-            from 
-                financial_assistance_applications 
-            where 
-               ((beneficiary_id = %(id)s) and (applied_at between %(start_date)s and %(end_date)s))
-            ;
-                
-        """
-    previous_application = execute_sql_select_statement(existed_application_sql, {"id": user.id, "start_date": start_date, "end_date": end_date}, fetch_all = False)
-    # print(previous_application)
-    if previous_application:
-        # print(previous_application)
-        return templates.TemplateResponse("application_form.html", {"request": request, "user": user, "applied": True})
-    
-    return templates.TemplateResponse("application_form.html", {"request": request, "user": user})
+    return templates.TemplateResponse("application_form.html", context)
 
 
 
@@ -270,13 +336,12 @@ async def create_financial_assistance_form(
     user: schemas.TokenData = Depends(get_current_beneficiary),
     application_form: schemas.FinancialAssistanceApplication = Form()
 ):
-    
-    existed_application_sql: str = "select * from financial_assistance_applications where beneficiary_id = %(beneficiary_id)s and current_semester = %(current_semester)s;"
-    existed_application = execute_sql_select_statement(existed_application_sql, {"beneficiary_id": user.id, "current_semester": application_form.current_semester}, fetch_all = False)
+    application_period_data = get_application_period_data(user.id)
 
-    if existed_application:
-        return templates.TemplateResponse("application_form.html", {"request": request, "error_message": "Already applied for this semester."})
-    
+    # Computed again to avoid duplicate submission of data from malicious user.
+    if application_period_data["previous_application"]:
+        return templates.TemplateResponse("application_form.html", {"request": request, "user": user, "application_period": application_period_data})
+
     data = application_form.model_dump(exclude = {'latest_sem_marksheet', 'previous_sem_marksheet', 'bonafide_or_fee_paid_proof', 'special_consideration'})
 
     # Calculate the difference in Semester percentage.
@@ -304,21 +369,19 @@ async def create_financial_assistance_form(
     sql: str = """
         insert into 
             financial_assistance_applications(
-            beneficiary_id, beneficiary_status, parental_status, total_annual_family_income,
+            beneficiary_id, application_period_id, beneficiary_status, parental_status, total_annual_family_income,
             house_status, special_consideration, reason_for_expecting_financial_assistance,
             have_failed_in_any_subject_in_last_2_sem, latest_sem_perc, previous_sem_perc,
             difference_in_sem_perc, current_semester, latest_sem_marksheet, previous_sem_marksheet,
             bonafide_or_fee_paid_proof
         )
         values(
-            %(beneficiary_id)s, %(beneficiary_status)s, %(parental_status)s, %(total_annual_family_income)s,
+            %(beneficiary_id)s, %(application_period_id)s, %(beneficiary_status)s, %(parental_status)s, %(total_annual_family_income)s,
             %(house_status)s, %(special_consideration)s, %(reason_for_expecting_financial_assistance)s,
             %(have_failed_in_any_subject_in_last_2_sem)s, %(latest_sem_perc)s, %(previous_sem_perc)s,
             %(difference_in_sem_perc)s, %(current_semester)s, %(latest_sem_marksheet)s, %(previous_sem_marksheet)s,
             %(bonafide_or_fee_paid_proof)s    
-        )
-        returning *
-        ;
+        );
     """    
 
     new_application: None = execute_sql_commands(sql, data)

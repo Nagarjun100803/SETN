@@ -6,13 +6,21 @@
 
 
 
-    <div class="min-h-screen flex flex-col justify-center items-center m-5 mt-20">
-        {% if applied %}
+    <div class="min-h-screen flex flex-col justify-center items-center m-5 mt-10">
+        {% if message %}
         <div>
-            <p >Already Applied for this semester</p>
+            <p>{{message}}</p>
+        </div>
+        {% elif not application_period.status %}
+        <div>
+            <p>Application Portal Will Open Soon.</p>
+        </div>
+        {% elif application_period.previous_application %}
+        <div>
+            <p >Already applied for this semester</p>
         </div>
         {% else %}
-        <div id="full-form" class="bg-white rounded-lg mt-5 shadow-lg shadow-gray-900 lg:w-1/2">
+        <div id="full-form" class="bg-slate-50 rounded-lg mt-5 shadow-lg shadow-gray-900 lg:w-1/2">
             
 
             <div id="form" class="font-mono italic flex flex-col gap-2 p-10">
@@ -25,11 +33,13 @@
                     <p>{{error_message}}</p>
                 </div>
                 {% endif %}
-                
+
                 <form method="post" enctype="multipart/form-data" class="grid grid-cols-1 mt-2 gap-2  sm:grid sm:grid-cols-2  sm:gap-4 sm:space-x-2 sm:items-center md:text-md">
+                    <input type="hidden" name="application_period_id" id="application_period_id" value="{{application_period.id}}">
+
                     <div class="flex flex-col gap-0.5" id="beneficiary_status-div">
                         <label for="beneficiary_status">Beneficiary Status</label>
-                        <select name="beneficiary_status" id="beneficiary_status" class="rounded-lg border-2 border-indigo-500 focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                        <select name="beneficiary_status" id="beneficiary_status" class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
                             <option value="Received Before">Received Before</option>
                             <option value="Not Received Before">Not Received Before</option>
                         </select>
@@ -37,7 +47,7 @@
                     
                     <div class="flex flex-col gap-0.5" id="parental_status">
                         <label for="parental_status" >Parental Status</label>
-                        <select name="parental_status" id="parental_status" class="rounded-lg border-2 border-indigo-500 focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                        <select name="parental_status" id="parental_status" class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
                             <option value="Living with Father and Mother">Living with Father and Mother</option>
                             <option value="Living with Father">Living with Father</option>
                             <option value="Living with Mother">Living with Mother</option>
@@ -47,7 +57,7 @@
                     
                     <div class="flex flex-col gap-0.5" id="house_status">
                         <label for="house_status" >House Status</label>
-                        <select name="house_status" id="house_status" class="rounded-lg border-2 border-indigo-500 focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                        <select name="house_status" id="house_status" class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
                             <option value="Own">Own</option>
                             <option value="Rental">Rental</option>
                             <option value="Leased">Leased</option>
@@ -56,7 +66,7 @@
                     
                     <div class="flex flex-col gap-0.5" id="total_annual_family_income-div">
                         <label for="total_annual_family_income">Annual Family Income</label>
-                        <select name="total_annual_family_income" id="total_annual_family_income" class="rounded-lg border-2 border-indigo-500 focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                        <select name="total_annual_family_income" id="total_annual_family_income" class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
                             <option value="Upto Rs 1,20,000">Upto Rs 1,20,000</option>
                             <option value="Between Rs 1,20,000 and Rs 2,40,000">Between Rs 1,20,000 and Rs 2,40,000</option>
                             <option value="Greater than Rs 2,40,000">Greater than Rs 2,40,000</option>
@@ -66,7 +76,7 @@
                     
                     <div class="flex flex-col gap-0.5" id="have_failed_in_any_subject_in_last_2_sem-div">
                         <label for="have_failed_in_any_subject_in_last_2_sem">Any Arrear</label>
-                        <select name="have_failed_in_any_subject_in_last_2_sem" id="have_failed_in_any_subject_in_last_2_sem" class="rounded-lg border-2 border-indigo-500 focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                        <select name="have_failed_in_any_subject_in_last_2_sem" id="have_failed_in_any_subject_in_last_2_sem" class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
                             <option value="true">Yes</option>
                             <option value="false">No</option>
                         </select>
@@ -77,23 +87,19 @@
                     <div class="flex flex-col gap-0.5" id="latest_sem_perc-div">
                         <label for="latest_sem_perc" >Lateset Sem Percentage</label>
                         <input required type="number" name="latest_sem_perc"  min="50" max="100" step="0.01" oninput="validateRange(this)" placeholder="76.90" id="latest_sem_perc" pattern="d{2}" 
-                            class="rounded-lg border-2 border-indigo-500 focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                            class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
                     </div>
                     
                     <div class="flex flex-col gap-0.5" id="previous_sem_perc-div">
                         <label for="previous_sem_perc" >Previous Sem Percentage</label>
                         <input required type="number" name="previous_sem_perc" min="50" max="100" step="0.01" oninput="validateRange(this)" placeholder="72.98" id="previous_sem_perc" pattern="d{2}" 
-                            class="rounded-lg border-2 border-indigo-500 focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                            class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
                     </div>
                     
                     <div class="flex flex-col gap-0.5" id="current_semester-div">
                         <label for="current_semester" >Current Semester</label>
-                        <select name="current_semester" id="current_semester" class="rounded-lg border-2 border-indigo-500 focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
-                            <option value="2">2</option>
-                            <option value="4">4</option>
-                            <option value="6">6</option>
-                            <option value="8">8</option>
-                            <option value="10">10</option>
+                        <select name="current_semester" id="current_semester" class="rounded-lg  focus:ring-1 focus:ring--600  focus:shadow-gray-900 focus:shadow-md">
+                        <!-- options will dynammically update by JS and Jinja -->
                         </select>
                     </div>
                     
@@ -120,9 +126,8 @@
 
                     <div class="flex flex-col gap-0.5 sm:col-span-2" id="reason_for_expecting_financial_assistance-div">
                         <label for="reason_for_expecting_financial_assistance">Describe your situation</label>
-                        <!-- <input required type="text" name="reason_for_expecting_financial_assistance" id="reason_for_expecting_financial_assistance" placeholder="Reason for expecting financial assistance?" class="rounded-lg focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md"> -->
                         <textarea name="reason_for_expecting_financial_assistance" id="reason_for_expecting_financial_assistance" 
-                            class="rounded-lg border-2 border-indigo-500 focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md"></textarea>
+                            class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md"></textarea>
                     </div>
 
                     
@@ -150,7 +155,7 @@
                         <span class="text-red-600"><span class="text-lg font-bold underline pr-2">Note:</span>Please enter the details carefully any disciplenary can lead to immediate rejection!</span>
                     </div>
                     <div class="flex flex-col mt-3 sm:mt-4 sm:col-span-2">
-                        <button class=" bg-indigo-600 text-white rounded-lg px-14 py-3" type="submit">Submit</button>
+                        <button class=" bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg px-14 py-3" type="submit">Submit</button>
                     </div>
                     
                 </form>
@@ -158,6 +163,33 @@
         </div>
     </div>   
     {% endif %} 
+
+    <script>
+
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const semester_drop_down = document.getElementById("current_semester");
+
+            // Define odd and even semester list.
+            odd = [1, 3, 5, 7, 9];
+            even = [2, 4, 6, 8, 10]; 
+
+            // Clear existing options
+            semester_drop_down.innerHTML = '';
+            
+            // Determine which semesters to display
+            console.log({{application_period.semester}})
+            const semesters_to_show = {{application_period.semester | tojson }} === 'odd' ? odd : even;
+            
+            semesters_to_show.forEach(semester => {
+                const option = document.createElement("option");
+                option.value = semester;
+                option.textContent = semester;
+                semester_drop_down.appendChild(option);
+            });
+
+        })
+    </script>
 
 {% endblock %}
 

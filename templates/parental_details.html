@@ -11,7 +11,7 @@
         </div>
         {% else %}
         
-        <div id="full-form" class="bg-white rounded-lg shadow-lg shadow-gray-900 lg:w-1/2">
+        <div id="full-form" class="bg-slate-50 rounded-lg shadow-lg shadow-gray-900 lg:w-1/2">
             
             <div id="form" class="font-mono italic flex flex-col gap-2 p-10">
                 <div id="heading-div">
@@ -24,55 +24,55 @@
 
                     <div class="flex flex-col gap-0.5" id="father_name-div">
                         <label for="father_name">Father Name</label>
-                        <input required type="text" name="father_name" id="father_name" placeholder="Ram" class="rounded-lg border-2 border-indigo-500 focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                        <input required type="text" name="father_name" id="father_name" placeholder="Ram" class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
                     </div>
 
                     <div class="flex flex-col gap-0.5" id="mothet_name-div">
                         <label for="mothet_name">Mother Name</label>
-                        <input required type="text" name="mother_name" id="mothet_name" placeholder="Prabhavathi" class="rounded-lg border-2 border-indigo-500 focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                        <input required type="text" name="mother_name" id="mothet_name" placeholder="Prabhavathi" class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
                     </div>
 
                     <div class="flex flex-col gap-0.5" id="father_occupation-div">
                         <label for="father_occupation">Father Occupation</label>
-                        <input required type="text" name="father_occupation" id="father_occupation" placeholder="Silk Weaver" class="rounded-lg border-2 border-indigo-500 focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                        <input required type="text" name="father_occupation" id="father_occupation" placeholder="Silk Weaver" class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
                     </div>
                     
                     <div class="flex flex-col gap-0.5" id="mother_occupation-div">
                         <label for="mother_occupation" class="text-md">Mother Occupation</label>
-                        <input required  type="text" name="mother_occupation" id="mother_occupation" placeholder="Home Maker" class="rounded-lg border-2 border-indigo-500 focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                        <input required  type="text" name="mother_occupation" id="mother_occupation" placeholder="Home Maker" class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
                     </div>
                     
                     <div class="flex flex-col gap-0.5" id="parent_phone_num-div">
                         <label for="parent_phone_num">Parent Phone Number</label>
-                        <input required type="number" maxlength="10" name="parent_phone_num" id="parent_phone_num" placeholder="************" class="rounded-lg border-2 border-indigo-500 focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                        <input required type="number" maxlength="10" name="parent_phone_num" id="parent_phone_num" placeholder="************" class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
                     </div>
 
                     <div class="flex flex-col gap-0.5" id="address_line-div">
                         <label for="address_line">Address Line</label>
-                        <input required type="text" name="address_line" id="address_line" placeholder="No.5 Second street" class="rounded-lg border-2 border-indigo-500 focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                        <input required type="text" name="address_line" id="address_line" placeholder="No.5 Second street" class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
                     </div>
 
                     <div class="flex flex-col gap-0.5" id="city-div">
                         <label for="city">City</label>
-                        <input required type="text" name="city" id="city" placeholder="Kumbakonam" class="rounded-lg border-2 border-indigo-500 focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                        <input required type="text" name="city" id="city" placeholder="Kumbakonam" class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
                     </div>
 
                     <div class="flex flex-col gap-0.5" id="district-div">
                         <label for="district">District</label>
-                        <input required type="text" name="district" id="district" placeholder="Thanjavur" class="rounded-lg border-2 border-indigo-500 focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                        <input required type="text" name="district" id="district" placeholder="Thanjavur" class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
                     </div>
 
                     <div class="flex flex-col gap-0.5" id="pincode-div">
                         <label for="pincode">Pincode</label>
-                        <input required type="text"  maxlength="6" name="pincode" id="pincode" placeholder="612702" class="rounded-lg border-2 border-indigo-500 focus:ring-2 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                        <input required type="text"  maxlength="6" name="pincode" id="pincode" placeholder="612702" class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
                     </div>
     
                     <div class="flex flex-col gap-2" id="family_pic-div">
                         <label for="family_pic">Family Photo</label>
-                        <input required type="file" name="family_pic" id="family_pic" accept="image/*">
+                        <input type="file" name="family_pic" id="family_pic" accept="image/*">
                     </div>
                     <div class="flex flex-col mt-3 sm:mt-4 sm:col-span-2">
-                        <button class=" bg-indigo-500 text-white rounded-lg px-14 py-3" type="submit">Submit</button>
+                        <button class=" bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg px-14 py-3" type="submit">Submit</button>
                     </div>
                 </form>
 

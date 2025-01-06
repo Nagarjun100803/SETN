@@ -2,6 +2,11 @@ from passlib.context import CryptContext
 from itsdangerous import URLSafeTimedSerializer
 from PIL import Image
 import io
+import pandas as pd
+from database import db 
+from psycopg2.extras import execute_values
+
+
 
 # Password context used to hash and verify the password to ensure security.
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated = 'auto')
@@ -52,3 +57,18 @@ def get_compressed_image(
         return compressed_binary_data
 
 
+if __name__ == '__main__':
+    course_df = pd.read_csv('./notebooks/final_course_list.csv')
+    sql: str = """
+        insert into courses(
+          course, degree, department, duration  
+        ) 
+        values
+        %s
+        ;
+    """
+    conn = db.getconn()
+    cur = conn.cursor()
+    execute_values(cur, sql, course_df.values)
+    conn.commit()
+    print('ok')

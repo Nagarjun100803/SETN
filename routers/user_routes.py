@@ -7,7 +7,7 @@ from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from config import get_user
 from utils import serializer
 from mail import send_reset_password_email
-from itsdangerous.exc import SignatureExpired
+from itsdangerous.exc import SignatureExpired, BadSignature
 
 
 
@@ -45,7 +45,9 @@ def get_password_reset_page(request: Request, token: str):
         # Load the payload to verify the data.
         payload: dict = serializer.loads(token, max_age = 900) # Token valid for 15 mins.
         # print(payload)
-    
+    except BadSignature:
+        return RedirectResponse("/forget_password", status_code = status.HTTP_307_TEMPORARY_REDIRECT)
+
     except SignatureExpired: # If the signature/token expired. Redirect the response to forget_password to make new request.
         return RedirectResponse("/forget_password", status_code = status.HTTP_307_TEMPORARY_REDIRECT)
     

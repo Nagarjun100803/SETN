@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %} Beneficiary Verify {% endblock %}
+
+{% block content %}
+
+    <div class="bg-slate-50 p-6 mt-20 rounded-lg">
+        <!-- Profile Section -->
+        <div class="flex flex-col items-center">
+          <div class="relative w-40 h-40 lg:w-52 lg:h-52 mb-6">
+            <img
+              src="/admin/beneficiary_profile_pic/{{ profile.id }}"
+              alt="Profile Picture"
+              class="w-[150px] h-[150px] lg:w-[200px] lg:h-[200px]  rounded-full shadow-lg border-2 border-white hover:shadow-2xl transition-all"
+            />
+          </div>
+          <h1 class="text-2xl lg:text-3xl font-bold text-indigo-800">{{ profile.full_name }}</h1>
+          <p class="text-md lg:text-lg text-center">{{ profile.course }} - {{ profile.department }}</p>
+        </div>
+      
+        <!-- Details Section -->
+        <div class="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Personal Details -->
+          <div class="bg-white shadow-md hover:shadow-lg rounded-lg p-6 border-2 border-indigo-500">
+            <h2 class="text-xl font-semibold text-emerald-700 mb-4">Personal Details</h2>
+            <p class="font-bold"><span class="font-medium">Gender:</span> {{ profile.gender }}</p>
+            <p class="font-bold"><span class="font-medium">Phone:</span> {{ profile.phone_num }}</p>
+            <p class="font-bold"><span class="font-medium">Gheru Naav:</span> {{ profile.gheru_naav }}</p>
+            <p class="font-bold"><span class="font-medium">Date of Birth:</span> {{ profile.date_of_birth }}</p>
+            <p class="font-bold"><span class="font-medium">Gmail:</span> {{ profile.email_id }}</p>
+          
+          </div>
+      
+          <!-- Parental Details -->
+          <div class="bg-white shadow-md hover:shadow-lg rounded-lg p-6 border-2  border-indigo-500">
+            <h2 class="text-xl font-semibold text-emerald-700 mb-4">Parental Details</h2>
+            <p class="font-bold"><span class="font-medium">Father's Name:</span> {{ profile.father_name }}</p>
+            <p class="font-bold"><span class="font-medium">Father's Occupation:</span> {{ profile.father_occupation }}</p>
+            <p class="font-bold"><span class="font-medium">Mother's Name:</span> {{ profile.mother_name }}</p>
+            <p class="font-bold"><span class="font-medium">Mother's Occupation:</span> {{ profile.mother_occupation }}</p>
+            <p class="font-bold"><span class="font-medium">Address:</span> {{ profile.address_line }}, {{ profile.city }}, {{ profile.district }} - {{ profile.pincode }}</p>
+          </div>
+      
+          <!-- Educational Details -->
+          <div class="bg-white shadow-md hover:shadow-lg rounded-lg p-6 border-2 border-indigo-500">
+            <h2 class="text-xl font-semibold text-emerald-700 mb-4">Educational Details</h2>
+            <p class="font-bold"><span class="font-medium">10th Percentage:</span> {{ profile.tenth_perc }}%</p>
+            <p class="font-bold"><span class="font-medium">12th Percentage:</span> {{ profile.twelveth_perc }}%</p>
+            <p class="font-bold"><span class="font-medium">College:</span> {{ profile.college_name }}</p>
+            <p class="font-bold"><span class="font-medium">University:</span> {{ profile.university }}</p>
+            <p class="font-bold"><span class="font-medium">Course:</span> {{ profile.course }} - {{ profile.degree }}</p>
+          </div>
+        </div>
+      
+        <!-- Marksheet Links -->
+        <div class="mt-8 flex flex-col lg:flex-row gap-2 justify-center items-center">
+          <a target="_blank" href="/admin/beneficiary_marksheets/{{profile.id}}/?marksheet=tenth_marksheet" class="inline-block px-4 py-2 bg-indigo-500 text-white rounded-lg shadow-md hover:bg-indigo-600 hover:shadow-lg ">10th Marksheet</a>
+          <a target="_blank" href="/admin/beneficiary_marksheets/{{ profile.id }}/?marksheet=twelveth_marksheet"class="inline-block px-4 py-2 bg-indigo-500 text-white rounded-lg shadow-md hover:bg-indigo-600 hover:shadow-lg">12th Marksheet</a>
+        </div>
+      
+        <!-- Remarks Form -->
+        <div class="mt-12 bg-white shadow-md hover:shadow-lg rounded-lg p-6 ring-1 ring-emerald-400">
+          <h2 class="text-xl font-semibold text-gray-950 mb-4">Add Remarks and Verify</h2>
+          <form method="post" class="space-y-4">
+            <textarea required name="remarks" rows="4" placeholder="Enter your remarks here..."class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+            <div class="text-right">
+              <button type="submit" class="px-6 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 shadow-md hover:shadow-lg transition-all">Verify Beneficiary</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+{% endblock %}

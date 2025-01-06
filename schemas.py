@@ -44,18 +44,6 @@ class BeneficiaryParentalInfo(BaseModel):
 
 
 
-# class BeneficiaryEducationalInfo(BaseModel):
-
-#     tenth_perc: float 
-#     eleventh_perc: float 
-#     twelveth_perc: float 
-#     course: Literal['Engineering', 'Arts and Science']
-#     degree: Literal['UG', 'PG', 'PhD']
-#     department: Literal['Computer Science', 'Computer Application', 'Mathematics']
-#     college_name: str 
-#     college_type: Literal['Affiliated', 'Autonomous']
-#     university: str
-#     college_address: str
 
 class BeneficiaryEducationalInfo(BaseModel):
 
@@ -74,31 +62,15 @@ class BeneficiaryEducationalInfo(BaseModel):
     twelveth_marksheet: UploadFile
 
 
-
-# class FinancialAssistanceApplication(BaseModel):
-
-#     beneficiary_status: Literal['Received Financial Assistance Before', 'Not Received Financial Assistance Before']
-#     parental_status: Literal['Both Parents Alive', 'One Parent Alive', 'Both Parents Not Alive']
-#     total_annual_family_income: Literal[
-#         'Upto Rs 1,20,000', 'Greater than Rs 1,20,000 but less than or equal to Rs 2,40,000',
-#         'Greater than Rs 2,40,000'
-#     ]
-#     house_status: Literal['Rental', 'Own', 'Leased']
-#     special_consideration: Literal[
-#         'Loss of Job of Breadwinner', 'Sudden Illness Requiring Unexpected expenses',
-#         'Handicapped/Chronic Illness Requiring Expenses Regularly',
-#         'Student Doing Part Time Work To Support Family',
-#         'No Support From Relatives'                           
-#         ]
-#     reason_for_expecting_financial_assistance: str 
-#     have_failed_in_any_subject_in_last_2_sem: bool
-
-#     latest_sem_perc: float
-#     previous_sem_perc: float
-#     current_semester: int
-    
+class ApplicationPeriod(BaseModel):
+    academic_year: str
+    semester:  Literal['odd', 'even']
+    start_date: date 
+    end_date: date    
+     
 class FinancialAssistanceApplication(BaseModel):
 
+    application_period_id:int
     beneficiary_status: str
     parental_status: str
     total_annual_family_income: str
@@ -126,3 +98,6 @@ class PasswordResetSchema(BaseModel):
 
     new_password: str 
     confirm_new_password: str 
+
+class RemarksSchema(BaseModel):
+    remarks: str 

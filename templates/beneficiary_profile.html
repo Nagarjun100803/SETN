@@ -13,25 +13,49 @@
             <img 
               src="/admin/beneficiary_profile_pic/{{beneficiary.id}}" 
               alt="Profile Picture" 
-              class="w-[150px] h-[150px] rounded-full shadow-md mb-4 border-r-2 border-indigo-300"
+              class="w-[150px] h-[150px] lg:w-[200px] lg:h-[200px] rounded-full shadow-md mb-4 border-r-2 border-indigo-300"
             />
             <!-- Beneficiary Name -->
-            <h3 class="text-xl font-semibold text-emerald-900">{{ beneficiary.name }}</h3>
+            <h3 class="text-xl lg:text-2xl font-semibold text-emerald-900">{{ beneficiary.name }}</h3>
             <!-- Course and College -->
-            <div class="text-sm sm:text-lg text-black font-serif mt-2 text-center sm:flex-grow">
-              <p> <span class="font-bold text-gray-900">({{ beneficiary.degree }})</span> {{beneficiary.course }}</p>
-              <p>{{ beneficiary.department }}</p>
-              <p>{{ beneficiary.college_name }}</p>
+            <div class="xs:text-sm italic mt-2 text-center sm:flex-grow">
+              <p class="text-gray-950"><span class="font-bold">({{ beneficiary.degree }})</span> {{beneficiary.course }}</p>
+              <p class="text-indigo-600">({{ beneficiary.department }})</p>
+              <p class="text-red-600">{{ beneficiary.college_name }}</p>
             </div>
+            <div class="grid grid-cols-1 mt-3 text-md">
+              <div class="flex flex-row gap-2">
+                  <span >Mobile Number:</span>
+                  <p class="text-gray-950 font-bold underline">{{ beneficiary.phone_num }}</p>
+              </div>
+              <div class="flex flex-row gap-2">
+                  <span >Date of Birth:</span>
+                  <p>{{ beneficiary.date_of_birth }}</p>
+              </div>
+              <div class="flex flex-row gap-2">
+                <span>Status:</span>
+                {% if beneficiary.is_verified %}
+                  <p class="font-bold text-green-600">Verified</p>
+                {% else %}
+                  <p class="font-bold text-red-500">New</p>
+                {% endif %}
+            </div>
+          </div>
           </div>
           <!-- "More" Button -->
           <div class="p-4 flex justify-center">
+            {% if beneficiary.is_verified %}
             <a 
-              href="/beneficiary/{{ beneficiary.id }}" 
-              class="bg-indigo-500 hover:bg-emerald-600 text-white text-sm font-medium py-2 px-4 rounded-lg shadow-md"
+              href="/admin/beneficiary/{{ beneficiary.id }}" 
+              class="bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-medium py-2 px-4 rounded-lg shadow-md"
             >
               More
             </a>
+            {% else %}
+                <a href="/admin/beneficiary/verify/{{ beneficiary.id }}" class="bg-indigo-500 hover:bg-emerald-600 text-white text-sm font-medium py-2 px-4 rounded-lg shadow-md">
+                  Verify
+              </a>
+            {% endif %}
           </div>
         </div>
       </div>

@@ -5,21 +5,22 @@ from database import initate_database_tables
 from contextlib import asynccontextmanager
 
 
-@asynccontextmanager
-async def app_lifespan(app: FastAPI):
-    try:
-        initate_database_tables() # Initalizing the database tables.
-    except Exception as e:
-        print(f"Error occurs while initializing database tables : {e}")
-        raise 
-    yield # yield the control to the application.
+# @asynccontextmanager
+# async def app_lifespan(app: FastAPI):
+#     try:
+#         initate_database_tables() # Initalizing the database tables.
+#         print("Life span starts")
+#     except Exception as e:
+#         print(f"Error occurs while initializing database tables : {e}")
+#         raise 
+#     yield # yield the control to the application.
             
 
 
 app: FastAPI = FastAPI(
     title = "Sourashtra Engineers and Technologists Network",
     version = "0.1.0",
-    lifespan = app_lifespan
+    # lifespan = app_lifespan
 ) 
 
 
