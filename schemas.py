@@ -4,6 +4,7 @@ from datetime import date
 from fastapi import UploadFile
 
 
+
 class UserCreate(BaseModel):
 
     email_id: EmailStr 
@@ -60,6 +61,19 @@ class BeneficiaryEducationalInfo(BaseModel):
     tenth_marksheet: UploadFile
     eleventh_marksheet: UploadFile
     twelveth_marksheet: UploadFile
+
+
+class BeneficiaryBankInfo(BaseModel):
+    
+    account_holder_name: str 
+    account_number: str 
+    ifsc_code: str
+    bank_name: str 
+    branch: str 
+    bank_address: str
+    phone_number: str
+    upi_id: str 
+    passbook: UploadFile
 
 
 class ApplicationPeriod(BaseModel):

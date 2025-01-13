@@ -113,3 +113,25 @@ def get_current_admin(user: schemas.TokenData = Depends(get_current_user)) -> sc
             headers = {"Location": "/index"}
     )
     
+
+def get_current_volunteer(user: schemas.TokenData = Depends(get_current_user)) -> schemas.TokenData:
+
+    if user.role == "volunteer":
+        return user
+
+    raise HTTPException(
+        status_code = status.HTTP_403_FORBIDDEN, 
+        detail = 'You are not a volunteer'
+    )
+
+def get_current_admin_or_volunteer(
+    user: schemas.TokenData = Depends(get_current_user)
+) -> schemas.TokenData:
+    
+    if (user.role == "admin") or (user.role == "volunteer"):
+        return user 
+    
+    raise HTTPException(
+        status_code = status.HTTP_403_FORBIDDEN,
+        detail = "You are not an admin or volunteer." 
+    )

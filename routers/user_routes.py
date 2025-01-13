@@ -67,14 +67,7 @@ def create_new_user(
     user_info: schemas.UserCreate = Form()
 ):
     
-    if user_info.password != user_info.confirm_password: # Need to change this logic in client side.
-        return templates.TemplateResponse("signup.html", {
-            'request': request, 'error_message': 'Password and Confirm password not matched.!',
-            'email_id': user_info.email_id, 'username': user_info.username
-        }, status_code = 400)
-
-    sql: str = """select * from users where email_id = %(email_id)s;"""
-    previous_record = execute_sql_select_statement(sql, {'email_id': user_info.email_id}, fetch_all = False)
+    previous_record = get_user("email_id", value = user_info.email_id)
     
     # If user already found with the email id, return a error message.
     if previous_record:
@@ -186,10 +179,6 @@ def reset_user_password(
     payload: dict = serializer.loads(token)
     
     email_id = payload["email_id"]
-    
-    if password_reset_schema.new_password != password_reset_schema.confirm_new_password:
-        context.update({"error_message": "Password and confirm password not matched!"})
-        return templates.TemplateResponse("reset_password.html", context)
     
     # Password reset operation.
     new_password = utils.get_hash_password(password_reset_schema.new_password) # Get a hashed version of password.

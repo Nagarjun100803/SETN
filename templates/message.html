@@ -2,13 +2,13 @@
 
 {% extends "base.html" %}
 
-{% block title %} Error {% endblock %}
+{% block title %} {{message_type}} {% endblock %}
 
 
 {% block content %} 
 
     <div class="min-h-screen flex justify-center items-center">
-        <p>{{ message }}</p>
+        <h1 class="text-lg lg:text-2xl text-gray-950 font-bold">{{ message }}</h1>
     </div>
 
 {% endblock %}

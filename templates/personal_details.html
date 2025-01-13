@@ -24,7 +24,7 @@
                 </div>
                 {% endif %}
                 
-                <form method="post" enctype="multipart/form-data" class="grid grid-cols-1 mt-2 gap-2 sm:grid sm:grid-cols-2 sm:gap-3">
+                <form method="post" id="personal_details_form" enctype="multipart/form-data" class="grid grid-cols-1 mt-2 gap-2 sm:grid sm:grid-cols-2 sm:gap-3">
 
                     <div class="flex flex-col gap-0.5" id="initial-div">
                         <label for="initial">Initial</label>
@@ -56,7 +56,9 @@
                     
                     <div class="flex flex-col gap-0.5" id="aadhar_num-div">
                         <label for="aadhar_num">Aadhar Number</label>
-                        <input required type="number" name="aadhar_num" id="aadhar_num" placeholder="************" class="rounded-lg focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                        <input required type="text" name="aadhar_num" id="aadhar_num" maxlength="12" placeholder="************" class="rounded-lg focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                        <small id="aadhar_num_error_msg" class="text-red-500 hidden"></small>
+                        
                     </div>
 
                     <div class="flex flex-col gap-0.5" id="date_of_birth-div">
@@ -66,7 +68,9 @@
 
                     <div class="flex flex-col gap-0.5" id="phone_num-div">
                         <label for="phone_num">Phone Number</label>
-                        <input required type="number" name="phone_num" id="phone_num" placeholder="1234567890" class="rounded-lg focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                        <input required type="text" name="phone_num" id="phone_num" maxlength="10" placeholder="1234567890" class="rounded-lg focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                        <small id="phone_num_error_msg" class="text-red-500 hidden"></small>
+                        
                     </div>
     
                     <div class="flex flex-col gap-2" id="passport_size_pic-div">
@@ -79,6 +83,62 @@
                 </form>
 
         </div>
-    </div>    
+    </div>
+    
+    <script>
+            document.addEventListener("DOMContentLoaded", () => {
+
+                const personalDetailsForm = document.getElementById("personal_details_form");
+                const phoneNumber = document.getElementById("phone_num");
+                const aadharNumber = document.getElementById("aadhar_num");
+                const phoneNumberErrorMsg = document.getElementById("phone_num_error_msg");
+                const aadharNumberErrorMsg = document.getElementById("aadhar_num_error_msg");
+
+                phoneNumberRegEx = /^[6-9]\d{9}$/;
+                aadharNumberRegex = /^\d{12}$/;
+
+                
+                //Handling input event
+                phoneNumber.addEventListener("input", () => {
+                    
+                    if (!phoneNumberRegEx.test(phoneNumber.value.trim())){
+                        phoneNumberErrorMsg.textContent = "Enter valid phone number.";
+                        phoneNumberErrorMsg.classList.remove("hidden");
+                        phoneNumber.focus();
+                    }
+                    else{
+                        phoneNumberErrorMsg.textContent = "";
+                        phoneNumberErrorMsg.classList.add("hidden");
+                    }
+
+                });
+
+                aadharNumber.addEventListener("input", () => {
+                    if (!aadharNumberRegex.test(aadharNumber.value.trim())){
+                        aadharNumberErrorMsg.textContent = "Enter valid aadhar number!";
+                        aadharNumberErrorMsg.classList.remove("hidden");
+                        aadharNumber.focus();
+                    }
+                    else{
+                        aadharNumberErrorMsg.textContent = "";
+                        aadharNumberErrorMsg.classList.add("hidden");
+                    }
+                });
+
+                personalDetailsForm.addEventListener("submit", (event) => {
+                    console.log('Hello');
+                    if (!aadharNumberRegex.test(aadharNumber.value.trim())){
+                        event.preventDefault();
+                        aadharNumber.focus();
+                    }
+                    else if (!phoneNumberRegEx.test(phoneNumber.value.trim())){
+                        event.preventDefault();
+                        phoneNumber.focus();
+                    }  
+                });
+
+            })
+
+    </script>
     {% endif %}
 {% endblock %}

@@ -41,7 +41,8 @@ def require_complete_profile(beneficiary: schemas.TokenData = Depends(get_curren
         select 
             (select id from beneficiary_personal_details where id = %(beneficiary_id)s) as personal_detail,
             (select id from beneficiary_parental_details where id = %(beneficiary_id)s) as parental_detail,
-            (select id from beneficiary_educational_details where id = %(beneficiary_id)s) as educational_detail
+            (select id from beneficiary_educational_details where id = %(beneficiary_id)s) as educational_detail,
+            (select id from beneficiary_bank_details where id = %(beneficiary_id)s) as bank_detail
         ;
     """
 
@@ -55,6 +56,8 @@ def require_complete_profile(beneficiary: schemas.TokenData = Depends(get_curren
         raise HTTPException(status_code = 307, headers = {"Location": "/parental_details"})
     if not profile['educational_detail']:
         raise HTTPException(status_code = 307, headers = {"Location": "/educational_details"})
+    if not profile['bank_detail']:
+        raise HTTPException(status_code = 307, headers = {"Location": "/bank_details"})
 
 
 def get_profile_status(beneficiary: schemas.TokenData = Depends(get_current_beneficiary)) -> bool:
@@ -124,6 +127,22 @@ def get_educational_details_page(
     context.update({"course": course_list})
     # print(context)
     return templates.TemplateResponse("educational_details.html", context)
+
+
+@router.get("/bank_details")
+def get_bank_details_page(
+    request: Request,
+    user: schemas.TokenData = Depends(get_current_beneficiary)
+):
+    sql: str = """select 1 from beneficiary_bank_details where id = %(beneficiary_id)s;"""
+    
+    previous_record = execute_sql_select_statement(sql, {"beneficiary_id": user.id})
+
+    if previous_record:
+        return templates.TemplateResponse("message.html", {"request": request, "user": user, "message_type": "Error", "message": "Already Filled Bank Details."})
+
+    return templates.TemplateResponse("bank_details.html", {"request": request, "user": user})
+
 
 
 def get_application_period_data(beneficiary_id: int):
@@ -328,7 +347,7 @@ async def create_educational_details(
 
     new_data: None = execute_sql_commands(sql, data)
 
-    return RedirectResponse("/financial_assistance_application", status_code = status.HTTP_302_FOUND)
+    return RedirectResponse("/bank_details", status_code = status.HTTP_302_FOUND)
 
 @router.post("/financial_assistance_application")
 async def create_financial_assistance_form(
@@ -387,4 +406,44 @@ async def create_financial_assistance_form(
     new_application: None = execute_sql_commands(sql, data)
 
     return RedirectResponse("/application_success", status_code = status.HTTP_302_FOUND)
+
+
+@router.post("/bank_details")
+async def create_bank_details(
+    request: Request,
+    user: schemas.TokenData = Depends(get_current_beneficiary),
+    bank_details: schemas.BeneficiaryBankInfo = Form()
+):
+    # Check the beneficiary already filled the bank details.
+
+    sql: str = """select 1 from beneficiary_bank_details where id = %(beneficiary_id)s;"""
+
+    previous_record = execute_sql_select_statement(
+        sql, {"beneficiary_id": user.id}, 
+        fetch_all = False
+    )
+
+    if previous_record:
+        return templates.TemplateResponse("message.html", {"request": request, "user": user, "message_type": "Error", "message": "Already Filled Bank Details."})
+
+    sql: str = """
+        insert into beneficiary_bank_details(
+            id, account_holder_name, account_number, ifsc_code,bank_name, 
+            branch, bank_address, phone_number, upi_id, passbook
+        )
+        values (
+            %(id)s, %(account_holder_name)s, %(account_number)s, %(ifsc_code)s, %(bank_name)s, 
+            %(branch)s, %(bank_address)s, %(phone_number)s, %(upi_id)s, %(passbook)s
+        );
+    """
+    # Read the passbook.
+    passbook_content: bytes = await bank_details.passbook.read()
+    
+    vars = bank_details.model_dump(exclude = {"passbook"})
+    print(vars)
+    vars.update({"id": user.id, "passbook": passbook_content})
+
+    new_bank_details = execute_sql_commands(sql, vars)
+
+    return RedirectResponse("/financial_assistance_application", status_code = status.HTTP_302_FOUND)
 

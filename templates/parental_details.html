@@ -20,7 +20,7 @@
                     
                 </div> 
                 
-                <form method="post" enctype="multipart/form-data" class="grid grid-cols-1 mt-2 gap-2 sm:grid sm:grid-cols-2 sm:gap-3 sm:items-center">
+                <form method="post" id="parent_details_form" enctype="multipart/form-data" class="grid grid-cols-1 mt-2 gap-2 sm:grid sm:grid-cols-2 sm:gap-3 sm:items-center">
 
                     <div class="flex flex-col gap-0.5" id="father_name-div">
                         <label for="father_name">Father Name</label>
@@ -44,7 +44,8 @@
                     
                     <div class="flex flex-col gap-0.5" id="parent_phone_num-div">
                         <label for="parent_phone_num">Parent Phone Number</label>
-                        <input required type="number" maxlength="10" name="parent_phone_num" id="parent_phone_num" placeholder="************" class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                        <input required type="text" maxlength="10" name="parent_phone_num" id="parent_phone_num" placeholder="9876543210" class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                        <small id="parent_phone_num_error_msg" class="text-red-600 hidden"></small>
                     </div>
 
                     <div class="flex flex-col gap-0.5" id="address_line-div">
@@ -65,10 +66,11 @@
                     <div class="flex flex-col gap-0.5" id="pincode-div">
                         <label for="pincode">Pincode</label>
                         <input required type="text"  maxlength="6" name="pincode" id="pincode" placeholder="612702" class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                        <small id="pincode_error_msg" class="text-red-600 hidden"></small>
                     </div>
     
                     <div class="flex flex-col gap-2" id="family_pic-div">
-                        <label for="family_pic">Family Photo</label>
+                        <label for="family_pic">Family Photo <span class="text-sm">(optional)</span></label>
                         <input type="file" name="family_pic" id="family_pic" accept="image/*">
                     </div>
                     <div class="flex flex-col mt-3 sm:mt-4 sm:col-span-2">
@@ -78,6 +80,60 @@
 
         </div>
     </div>
+
+    <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                
+                const parentDetailsForm = document.getElementById("parent_details_form");
+                const parentPhoneNumber = document.getElementById("parent_phone_num");
+                const pincode = document.getElementById("pincode");
+
+                const phoneNumberErrorField = document.getElementById("parent_phone_num_error_msg");
+                const pincodeErrorField = document.getElementById("pincode_error_msg");
+                const phoneNumberRegEx = /^[6-9]\d{9}$/;
+                const pincodeRegEx = /\d{6}$/;
+
+
+                // Phone Number Validator
+                parentPhoneNumber.addEventListener("input", () => {
+                    if (!phoneNumberRegEx.test(parentPhoneNumber.value.trim())){
+                        phoneNumberErrorField.textContent = "Enter valid mobile number!";
+                        phoneNumberErrorField.classList.remove("hidden");
+                    }
+                    else{
+                        phoneNumberErrorField.textContent = "";
+                        phoneNumberErrorField.classList.add("hidden");
+                    }
+                });
+
+                // Pincode Validator.
+                pincode.addEventListener("input", () => {
+                    if (!pincodeRegEx.test(pincode.value.trim())){
+                        pincodeErrorField.textContent = "Enter valid pincode!";
+                        pincodeErrorField.classList.remove("hidden");
+                    }
+                    else{
+                        pincodeErrorField.textContent = "";
+                        pincodeErrorField.classList.add("hidden");
+                    }
+                });
+
+
+                // Prevent Form submission.
+                parentDetailsForm.addEventListener("submit", (event) => {
+                    if (!phoneNumberRegEx.test(parentPhoneNumber.value.trim())){
+                        event.preventDefault();
+                        parentPhoneNumber.focus();
+                    }
+                    else if (!pincodeRegEx.test(pincode.value.trim())){
+                        event.preventDefault();
+                        pincode.focus();
+                    }
+                });
+                
+
+            });
+    </script>
     {% endif %}
 
 {% endblock %}

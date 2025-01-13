@@ -3,63 +3,148 @@
 {% block title %} Beneficiaries {% endblock %}
 
 {% block content %}
-<div class="p-4 grid grid-cols-1 mt-20 sm:grid-cols-2 lg:grid-cols-3 gap-x-2 gap-y-3">
-  {% for beneficiary in beneficiaries %}
-    <div class="p-4">
-      <div class="max-w-md mx-auto h-full flex flex-col justify-between">
-        <div class="bg-slate-50 shadow-gray-700 shadow-lg rounded-lg overflow-hidden h-full flex flex-col">
-          <div class="p-4 flex flex-col items-center flex-grow">
-            <!-- Profile Picture -->
-            <img 
-              src="/admin/beneficiary_profile_pic/{{beneficiary.id}}" 
-              alt="Profile Picture" 
-              class="w-[150px] h-[150px] lg:w-[200px] lg:h-[200px] rounded-full shadow-md mb-4 border-r-2 border-indigo-300"
-            />
-            <!-- Beneficiary Name -->
-            <h3 class="text-xl lg:text-2xl font-semibold text-emerald-900">{{ beneficiary.name }}</h3>
-            <!-- Course and College -->
-            <div class="xs:text-sm italic mt-2 text-center sm:flex-grow">
-              <p class="text-gray-950"><span class="font-bold">({{ beneficiary.degree }})</span> {{beneficiary.course }}</p>
-              <p class="text-indigo-600">({{ beneficiary.department }})</p>
-              <p class="text-red-600">{{ beneficiary.college_name }}</p>
-            </div>
-            <div class="grid grid-cols-1 mt-3 text-md">
-              <div class="flex flex-row gap-2">
-                  <span >Mobile Number:</span>
-                  <p class="text-gray-950 font-bold underline">{{ beneficiary.phone_num }}</p>
-              </div>
-              <div class="flex flex-row gap-2">
-                  <span >Date of Birth:</span>
-                  <p>{{ beneficiary.date_of_birth }}</p>
-              </div>
-              <div class="flex flex-row gap-2">
-                <span>Status:</span>
-                {% if beneficiary.is_verified %}
-                  <p class="font-bold text-green-600">Verified</p>
-                {% else %}
-                  <p class="font-bold text-red-500">New</p>
-                {% endif %}
-            </div>
+
+    <!-- Filter Section  -->
+      <form method="get" class="grid grid-cols-1 mt-20 mx-10 gap-2 sm:grid-cols-12 sm:gap-3 justify-center items-center">
+
+        <div class="flex flex-col gap-0.5 sm:col-span-3" id="name-div">
+            <label for="name">Beneficiary Status</label>
+            <select name="beneficiary_status" id="beneficiary_status" class="rounded-lg shadow-gray-800 shadow-md">
+                <option value="all">All</option>
+                <option value="new">New</option>
+                <option value="verified">Verified</option>
+            </select>
+        </div>
+  
+        <div class="flex flex-col gap-0.5 sm:col-span-3" id="email_id-div">
+            <label for="email_id">Email Id</label>
+            <input type="search" name="email_id" id="email_id" placeholder="arjun1@gmail.com" class="rounded-lg focus:ring-1 focus:ring-indigo-600 shadow-gray-900 shadow-md">
+        </div>
+        
+        <div class="flex flex-col gap-0.5 sm:col-span-3" id="name-div">
+          <label for="name">Name</label>
+          <input type="search" name="name" id="name" placeholder="Nagarjun" class="rounded-lg focus:ring-1 focus:ring-indigo-600 shadow-gray-900 shadow-md">
+        </div>
+
+        <div class="sm:col-span-3 grid grid-cols-2 gap-2">
+          <div class="flex flex-col justify-center gap-0.5 sm:col-span-1 mt-2 sm:mt-5">
+            <button class="bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg p-[10px]" type="submit">Submit</button>
           </div>
-          </div>
-          <!-- "More" Button -->
-          <div class="p-4 flex justify-center">
-            {% if beneficiary.is_verified %}
-            <a 
-              href="/admin/beneficiary/{{ beneficiary.id }}" 
-              class="bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-medium py-2 px-4 rounded-lg shadow-md"
-            >
-              More
-            </a>
-            {% else %}
-                <a href="/admin/beneficiary/verify/{{ beneficiary.id }}" class="bg-indigo-500 hover:bg-emerald-600 text-white text-sm font-medium py-2 px-4 rounded-lg shadow-md">
-                  Verify
-              </a>
-            {% endif %}
+  
+          <div class="flex flex-col justify-center gap-0.5 sm:col-span-1 mt-2 sm:mt-5">
+            <button id="reset_button" class="bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg p-[10px]" type="reset">Reset</button>
           </div>
         </div>
-      </div>
+  
+      </form>
+
+
+    <div class="p-4 grid grid-cols-1 mt-5 sm:grid-cols-2 lg:grid-cols-3 gap-x-2 gap-y-3">
+      {% for beneficiary in beneficiaries %}
+        <div class="p-4">
+          <div class="max-w-md mx-auto h-full flex flex-col justify-between">
+            <div class="bg-slate-50 shadow-gray-700 shadow-lg rounded-lg overflow-hidden h-full flex flex-col">
+              <div class="p-4 flex flex-col items-center flex-grow">
+                <!-- Profile Picture -->
+                <img 
+                  src="/admin_and_volunteer/beneficiary_profile_pic/{{beneficiary.id}}" 
+                  alt="Profile Picture" 
+                  class="w-[150px] h-[150px] lg:w-[200px] lg:h-[200px] rounded-full shadow-md mb-4 border-2 border-white"
+                />
+                <!-- Beneficiary Name -->
+                <h3 class="text-xl lg:text-2xl font-semibold text-emerald-900">{{ beneficiary.name }}</h3>
+                <!-- Course and College -->
+                <div class="xs:text-sm italic mt-2 text-center sm:flex-grow">
+                  <p class="text-gray-950"><span class="font-bold">({{ beneficiary.degree }})</span> {{beneficiary.course }}</p>
+                  <p class="text-indigo-600">({{ beneficiary.department }})</p>
+                  {% if user.role == 'admin' %}
+                  <a href="/admin/beneficiaries?college_name={{beneficiary.college_name}}" class="text-red-600">{{ beneficiary.college_name }}</a>
+                  {% elif user.role == 'volunteer' %}
+                  <a href="/volunteer/beneficiaries?college_name={{beneficiary.college_name}}" class="text-red-600">{{ beneficiary.college_name }}</a>
+                  {% endif %}
+                </div>
+
+                <!-- Basic Details  -->
+                <div class="flex flex-col gap-1 justify-center items-start mt-3 text-md p-3 ">
+                  <p class="font-bold"><span class="font-medium">Phone Number:</span> {{ beneficiary.phone_num }}</p>
+                  <!-- <p class="font-bold"><span class="font-medium">Aadhar Number:</span> {{ beneficiary.aadhar_num }}</p> -->
+                  <p class="font-bold "><span class="font-medium">Date of Birth:</span> {{ beneficiary.date_of_birth }}</p>
+                  <p class="font-bold"><span class="font-medium">Status:</span>
+                    {% if beneficiary.is_verified %}
+                      <span class="text-green-600">Verified</span>
+                      {% else %}
+                        <span class="text-red-600">New</span>
+                      {% endif %}
+                  </p>
+                </div>
+                <!-- Email Div -->
+                <div class="flex flex-col justify-center">
+                  <p class="font-bold text-sm underline text-clip sm:text-md ">{{beneficiary.email_id}}</p>
+               </div>
+              </div>
+              <!-- "More" Button -->
+              <div class="p-4 flex justify-center">
+                {% if beneficiary.is_verified %}
+                    <a href="/admin_and_volunteer/beneficiary/explore/{{ beneficiary.id }}" class="bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-medium py-2 px-4 rounded-lg shadow-md">More</a>
+                {% else %}
+                    <a href="/admin_and_volunteer/beneficiary/explore/{{ beneficiary.id }}" class="bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-medium py-2 px-4 rounded-lg shadow-md">Verify</a>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
     </div>
-  {% endfor %}
-</div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const resetButton = document.getElementById("reset_button");
+        const emailField = document.getElementById("email_id");
+        const nameField = document.getElementById("name");
+        const beneficiaryStatusField = document.getElementById("beneficiary_status");
+        
+        // Backend-injected value for beneficiary status
+        const selectedBeneficiaryStatus = "{{ beneficiary_status | default('') }}";
+        const enteredEmailId = "{{email_id}}";
+        const enteredName = "{{name}}";
+        
+        // Set the dropdown value dynamically based on backend
+
+        if (selectedBeneficiaryStatus) {
+          Array.from(beneficiaryStatusField.options).forEach(option => {
+            if (option.value === selectedBeneficiaryStatus) {
+              option.selected = true;
+            }
+          });
+        }
+
+        if (enteredEmailId){
+          emailField.value = enteredEmailId;
+        }
+
+        if (enteredName){
+          nameField.value = enteredName;
+        }
+    
+        // Reset button logic
+        resetButton.addEventListener("click", () => {
+          emailField.value = ""; // Clear email field
+          beneficiaryStatusField.value = ""; // Reset dropdown to default
+        });
+
+        // Logic to make sure allow to enter only one field at a time.
+        emailField.addEventListener("input", () => {
+          if (emailField.value.trim() !== ""){
+            nameField.value = "";
+          }
+        });
+
+        nameField.addEventListener("input", () => {
+          if (nameField.value.trim() !== ""){
+            emailField.value = "";
+          }
+        })
+      });
+    </script>
+    
 {% endblock %}

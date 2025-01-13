@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Beneficiary Allocation{% endblock %}
+
+{% block content %}
+
+    <form id="beneficiary_assign_form" method="post" class="relative mt-20">
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-4 md:gap-3.5 pb-[calc(4rem+30px)]">
+            {% for beneficiary in (beneficiaries) %}
+            <div id="full_card" class="flex flex-col gap-0.5 justify-center items-center text-center bg-slate-50 rounded-lg shadow-sm shadow-gray-700 hover:shadow-xl">
+                <img src="/admin_and_volunteer/beneficiary_profile_pic/{{beneficiary.id}}" alt="" class="mt-3 w-[150px] h-[150px] lg:w-[200px] lg:h-[200px] rounded-full shadow-lg mb-4 border-2 border-white">
+                <h1 class="text-xl font-bold text-emerald-500">{{beneficiary.name}}</h1>
+                <div class="flex flex-col gap-0.5 flex-grow">
+                    <p class="text-gray-950">({{beneficiary.degree}}) - {{beneficiary.course}}</p>
+                    <p class="text-indigo-600">{{beneficiary.department}}</p>
+                    <p class="text-red-500 italic ">{{beneficiary.college_name}}</p>
+                    <p class="font-bold text-gray-950">{{beneficiary.phone_num}}</p>
+                </div>
+                <input type="checkbox" name="beneficiaries_id" id="{{beneficiary.id}}" value="{{beneficiary.id}}" class="mx-3 my-4 p-2 rounded-sm text-indigo-600">
+            </div>
+            {% endfor %}
+        </div>
+        <div id="fixed_buttons" class="fixed left-0 right-0 bottom-0 bg-slate-50 rounded-t-lg">
+            <div class="grid grid-cols-3 gap-4 mx-5 p-4 pt-8">
+                <button type="reset" form="beneficiary_assign_form" class="p-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600">Cancel</button>
+                <select name="volunteer_id" id="volunteer_select" class="p-2 rounded-md">
+                    <option value="null">Select Volunteer</option>
+                    {% for volunteer in volunteers %}
+                    <option value="{{volunteer.id}}">{{volunteer.username}}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" form="beneficiary_assign_form" class="p-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600">Submit</button>
+            </div>
+        </div>
+    </form>
+    
+    <script>
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('beneficiary_assign_form');
+
+            form.addEventListener('submit', (event) => {
+                // Get all checkboxes in the form
+                const checkboxes = form.querySelectorAll('input[type="checkbox"][name="beneficiaries_id"]');
+
+                // Check if at least one checkbox is checked
+                const isAnyChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+
+                if (!isAnyChecked) {
+                    // Prevent form submission if no checkbox is checked
+                    event.preventDefault();
+                    alert('Please select at least one beneficiary before submitting.');
+                }
+
+                // Volunteer Selection
+                const volunteerSelect = document.getElementById('volunteer_select');
+                if (volunteerSelect.value === 'null'){
+                    event.preventDefault();
+                    alert("Please select a volunteer to assign.");
+                    volunteerSelect.focus();
+                }
+
+            });
+        });
+    </script>
+
+{% endblock %}

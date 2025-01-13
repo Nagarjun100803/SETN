@@ -23,7 +23,7 @@
                         <p>{{error_message}}</p>
                     </div>
                 {% endif %}
-                <form method="post" class="grid grid-cols-1 gap-3 mt-3">
+                <form method="post" id="signup_form" class="grid grid-cols-1  gap-3 mt-3">
                     <div class="flex flex-col gap-0.5" id="email_id-div">
                         <label for="email_id">Email Id</label>
                         <input required autofocus type="email" name="email_id" id="email_id" placeholder="nagarjun1@gmail.com"
@@ -48,6 +48,7 @@
                         <label for="confirm_password">Confirm Password</label>
                         <input required type="password" name="confirm_password" id="confirm_password" placeholder="Enter confirm password" 
                             class="rounded-lg   focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                        <small id="confirm_password_error_msg" class="text-red-600 hidden"></small>
                     </div>
                     
 
@@ -63,6 +64,35 @@
         </div>
     </div>
 
+    <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                
+                const signupForm = document.getElementById("signup_form");
+
+                signupForm.addEventListener("submit", (event) => {
+                    const password = document.getElementById("password");
+                    const confirmPassword = document.getElementById("confirm_password");
+                    const errorMsgField = document.getElementById("confirm_password_error_msg");
+
+                    if (password.value !== confirmPassword.value){
+
+                        event.preventDefault(); // Stop the submission of form.
+                        errorMsgField.textContent = "Password should Match!";
+                        errorMsgField.classList.remove("hidden");
+                        confirmPassword.focus();
+                    }
+                    else{
+                        errorMsgField.textContent = "";
+                        errorMsgField.classList.add("hidden");
+
+                    }
+                
+                });
+                
+
+
+            });
+    </script>
 </body>
 </html>
 

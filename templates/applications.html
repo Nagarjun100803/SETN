@@ -10,7 +10,7 @@
         <div class="flex flex-col bg-slate-50 rounded-lg shadow-md shadow-gray-900">
             <!-- Profile Section -->
             <div id="basic_details" class="flex flex-col flex-grow gap-0.5 p-4 items-center text-center text-indigo-800">
-                <img src="/admin/beneficiary_profile_pic/{{ application.beneficiary_id }}"
+                <img src="/admin_and_volunteer/beneficiary_profile_pic/{{ application.beneficiary_id }}"
                     class="w-[150px] h-[150px] lg:w-[200px] lg:h-[200px] mt-2.5 rounded-full border-2 border-white shadow-md shadow-gray-800"
                     alt="" title="profile picture">
                     <h3 class="text-xl font-bold mt-2 text-emerald-600">{{ application.name }}</h3>
@@ -79,9 +79,9 @@
                     <span x-show="marksheetExpanded">> Hide Marksheets</span>
                 </button>
                 <div x-show="marksheetExpanded" x-cloak class="mt-2 flex flex-col items-end italic">
-                    <a target="_blank" href="/admin/application/uploads?beneficiary_id={{ application.beneficiary_id }}&current_semester={{ application.current_semester }}&document=latest_sem_marksheet" class="text-blue-600 hover:text-red-600 underline"><p>Latest Sem Marksheet</p></a>
-                    <a target="_blank" href="/admin/application/uploads?beneficiary_id={{ application.beneficiary_id }}&current_semester={{ application.current_semester }}&document=previous_sem_marksheet" class="text-blue-600 hover:text-red-600  underline"><p>Previous Sem Marksheet</p></a>
-                    <a target="_blank" href="/admin/application/uploads?beneficiary_id={{ application.beneficiary_id }}&current_semester={{ application.current_semester }}&document=bonafide_or_fee_paid_proof" class="text-blue-600 hover:text-red-600 underline"><p>Bonafide or Fee Paid</p></a>
+                    <a target="_blank" href="/admin_and_volunteer/application/uploads?beneficiary_id={{ application.beneficiary_id }}&current_semester={{ application.current_semester }}&document=latest_sem_marksheet" class="text-blue-600 hover:text-red-600 underline"><p>Latest Sem Marksheet</p></a>
+                    <a target="_blank" href="/admin_and_volunteer/application/uploads?beneficiary_id={{ application.beneficiary_id }}&current_semester={{ application.current_semester }}&document=previous_sem_marksheet" class="text-blue-600 hover:text-red-600  underline"><p>Previous Sem Marksheet</p></a>
+                    <a target="_blank" href="/admin_and_volunteer/application/uploads?beneficiary_id={{ application.beneficiary_id }}&current_semester={{ application.current_semester }}&document=bonafide_or_fee_paid_proof" class="text-blue-600 hover:text-red-600 underline"><p>Bonafide or Fee Paid</p></a>
                 </div>
             </div>
         </div>

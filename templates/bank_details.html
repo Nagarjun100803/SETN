@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Bank Details{% endblock %}
+
+{% block content %}
+
+    <div class="min-h-screen flex flex-col justify-center items-center m-5 ">
+        {% if filled %}
+            <div>
+                <p>Already filled your Bank Details</p>
+            </div>
+        {% else %}
+        
+        <div id="full-form" class="mt-20 bg-slate-50 rounded-lg shadow-lg shadow-gray-900 lg:w-1/2">
+            <div id="form" class="font-mono italic flex flex-col gap-2 p-10">
+                <div id="heading-div">
+                    <!-- <h1 class="text-xl text-indigo-500 font-bold italic text-center sm:text-xl lg:text-2xl">Personal Details</h1> -->
+                    <h1 class="text-xl text-gray-900 font-bold font-serif  text-center sm:text-xl lg:text-2xl">Bank Details</h1>
+                </div>
+
+                {% if error_message %}
+                <div id="error-div" class="text-center text-sm text-red-600 font-semibold italic sm:text-lg">
+                    <p>{{error_message}}</p>
+                </div>
+                {% endif %}
+                
+                <form method="post" id="bank_details_form" enctype="multipart/form-data" class="grid grid-cols-1 mt-2 gap-2 sm:grid sm:grid-cols-2 sm:gap-3">
+
+                    <div class="flex flex-col gap-0.5" id="account_holder_name-div">
+                        <label for="account_holder_name">Account Holder Name</label>
+                        <input required  type="text" name="account_holder_name" id="account_holder_name" placeholder="NAGARJUN RAMAKRISHNAN" class="rounded-lg focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                    </div>
+
+                    <div class="flex flex-col gap-0.5" id="account_number-div">
+                        <label for="account_number">Account Number</label>
+                        <input required  type="text" name="account_number" id="account_number" placeholder="980989867527363" class="rounded-lg focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                    </div>
+
+                    <div class="flex flex-col gap-0.5" aria-colcount="ifsc_code-div">
+                        <label for="ifsc_code">IFSC Code</label>
+                        <input required  type="text" name="ifsc_code" id="ifsc_code" placeholder="KUMBAKBOB" class="rounded-lg focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md ">
+                    </div>
+                    
+                    <div class="flex flex-col gap-0.5" id="bank_name-div">
+                        <label for="bank_name">Bank Name</label>
+                        <input required  type="text" name="bank_name" id="bank_name" placeholder="Bank of Baroda" class="rounded-lg focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md ">
+                    </div>
+                    
+                    <div class="flex flex-col gap-0.5" id="branch-div">
+                        <label for="branch" class="text-md">Bank Branch</label>
+                        <input required   type="text" name="branch" id="branch" placeholder="Kumbakonam" class="rounded-lg focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                    </div>
+
+                    <div class="flex flex-col gap-0.5" id="bank_address-div">
+                        <label for="bank_address" class="text-md">Bank Address</label>
+                        <input required   type="text" name="bank_address" id="bank_address" placeholder="No.5 Second Street Kumbakonam" class="rounded-lg focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                    </div>
+
+                    <div class="flex flex-col gap-2" id="phone_number-div">
+                        <label for="phone_number">Phone Number<span class="text-xs">(linked)</span></label>
+                        <input required  type="text" name="phone_number" id="phone_number" placeholder="9876543210" class="rounded-lg focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                        <small id="phone_num_error_msg" class="text-red-500 hidden"></small>
+                    </div>
+
+                    <div class="flex flex-col gap-2" id="upi_id-div">
+                        <label for="upi_id">UPI Id</label>
+                        <input required  type="text" name="upi_id" id="upi_id" placeholder="arjun@bob" class="rounded-lg focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
+                    </div>
+
+                    <div class="flex flex-col gap-2" id="passbook-div">
+                        <label for="passbook">Passbook<span class="text-sm">(front page)</span></label>
+                        <input required  type="file" name="passbook" id="passbook" accept=".pdf" class="">
+                    </div>
+
+
+                    <div class="flex flex-col mt-3 sm:mt-4 sm:col-span-2">
+                        <button class="bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg px-14 py-3" type="submit">Submit</button>
+                    </div>
+                </form>
+
+        </div>
+    </div>    
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            
+            const bankDetailForm = document.getElementById("bank_details_form");
+            const phoneNumberField = document.getElementById("phone_number");
+            const phoneNumberErrorMsgField = document.getElementById("phone_num_error_msg");
+            const phoneNumberRegEx = /^[6-9]\d{9}$/; // Example for 10-digit Indian phone numbers starting with 6-9
+            
+            
+            // Prevent the form submssion from the invalid phone number.
+            bankDetailForm.addEventListener("submit", (event) => {
+                const enteredPhoneNumber = phoneNumberField.value.trim();
+                if (!phoneNumberRegEx.test(enteredPhoneNumber)){
+                    event.preventDefault();
+                    phoneNumberField.focus();
+                }
+            });
+
+            phoneNumberField.addEventListener("input", () => {
+                const enteredPhoneNumber = phoneNumberField.value.trim();
+                // Check the mobile Number with regular expression.
+                if (!phoneNumberRegEx.test(enteredPhoneNumber)){
+                    phoneNumberErrorMsgField.textContent = "Enter a valid mobile number."
+                    phoneNumberErrorMsgField.classList.remove("hidden");
+                }
+                else{
+                    // clear the error message.
+                    phoneNumberErrorMsgField.textContent = "";
+                    phoneNumberErrorMsgField.classList.add("hidden");
+                }
+            });
+
+
+            
+        });
+
+    </script>
+        {% endif %}
+{% endblock %}

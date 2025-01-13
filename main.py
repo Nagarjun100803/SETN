@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from routers import user_routes, beneficiary_routes, admin_routes
+from routers import user_routes, beneficiary_routes, admin_routes, volunteer_routes, admin_volunteer_routes
 from database import initate_database_tables
 from contextlib import asynccontextmanager
 
@@ -29,6 +29,9 @@ app.mount("/static", StaticFiles(directory = "static"), name = "static")
 app.include_router(user_routes.router)
 app.include_router(beneficiary_routes.router)
 app.include_router(admin_routes.router)
+app.include_router(volunteer_routes.router)
+app.include_router(admin_volunteer_routes.router)
+
 
 
 

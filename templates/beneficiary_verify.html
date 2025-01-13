@@ -9,7 +9,7 @@
         <div class="flex flex-col items-center">
           <div class="relative w-40 h-40 lg:w-52 lg:h-52 mb-6">
             <img
-              src="/admin/beneficiary_profile_pic/{{ profile.id }}"
+              src="/admin_and_volunteer/beneficiary_profile_pic/{{ profile.id }}"
               alt="Profile Picture"
               class="w-[150px] h-[150px] lg:w-[200px] lg:h-[200px]  rounded-full shadow-lg border-2 border-white hover:shadow-2xl transition-all"
             />
@@ -28,6 +28,13 @@
             <p class="font-bold"><span class="font-medium">Gheru Naav:</span> {{ profile.gheru_naav }}</p>
             <p class="font-bold"><span class="font-medium">Date of Birth:</span> {{ profile.date_of_birth }}</p>
             <p class="font-bold"><span class="font-medium">Gmail:</span> {{ profile.email_id }}</p>
+            <p class="font-bold"><span class="font-medium">Status:</span> 
+                  {% if profile.is_verified %}
+                  <span class="text-green-400">Verified</span>
+                  {% else %}
+                  <span class="text-red-400">New</span>
+                  {% endif %}
+            </p>
           
           </div>
       
@@ -54,20 +61,67 @@
       
         <!-- Marksheet Links -->
         <div class="mt-8 flex flex-col lg:flex-row gap-2 justify-center items-center">
-          <a target="_blank" href="/admin/beneficiary_marksheets/{{profile.id}}/?marksheet=tenth_marksheet" class="inline-block px-4 py-2 bg-indigo-500 text-white rounded-lg shadow-md hover:bg-indigo-600 hover:shadow-lg ">10th Marksheet</a>
-          <a target="_blank" href="/admin/beneficiary_marksheets/{{ profile.id }}/?marksheet=twelveth_marksheet"class="inline-block px-4 py-2 bg-indigo-500 text-white rounded-lg shadow-md hover:bg-indigo-600 hover:shadow-lg">12th Marksheet</a>
+          <a target="_blank" href="/admin_and_volunteer/beneficiary_marksheets/{{profile.id}}/?marksheet=tenth_marksheet" class="inline-block px-4 py-2 bg-indigo-500 text-white rounded-lg shadow-md hover:bg-indigo-600 hover:shadow-lg ">10th Marksheet</a>
+          <a target="_blank" href="/admin_and_volunteer/beneficiary_marksheets/{{ profile.id }}/?marksheet=twelveth_marksheet"class="inline-block px-4 py-2 bg-indigo-500 text-white rounded-lg shadow-md hover:bg-indigo-600 hover:shadow-lg">12th Marksheet</a>
         </div>
       
         <!-- Remarks Form -->
         <div class="mt-12 bg-white shadow-md hover:shadow-lg rounded-lg p-6 ring-1 ring-emerald-400">
           <h2 class="text-xl font-semibold text-gray-950 mb-4">Add Remarks and Verify</h2>
-          <form method="post" class="space-y-4">
-            <textarea required name="remarks" rows="4" placeholder="Enter your remarks here..."class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
-            <div class="text-right">
-              <button type="submit" class="px-6 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 shadow-md hover:shadow-lg transition-all">Verify Beneficiary</button>
-            </div>
+          <form method="post" class="space-y-4" id="remarks-form">
+              <textarea required id="remarks-field"  name="remarks" rows="4" placeholder="Enter your remarks here..."class="w-full p-3 border rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 shadow shadow-lg" ></textarea>
+
+              {% if profile.edit_permission  %}
+                <div class="flex justify-between gap-4">
+                    {% if profile.is_verified %}
+                    <button id="edit-button" type="button" class="px-6 py-2 bg-indigo-500 text-white rounded-lg hover:bg-emerald-600 shadow-md hover:shadow-lg">Edit</button>
+                    {% endif %}
+                    <button id="submit-button" type="submit" class="px-6 py-2 bg-indigo-500 text-white rounded-lg hover:bg-emerald-600 shadow-md hover:shadow-lg">Verify</button>
+                
+                  </div>
+              {% else %}
+                <p class="text-center font-bold text-lg lg:text-xl">You cannot edit or verify this Beneficiary.</p>
+              {% endif %}
           </form>
         </div>
       </div>
+
+      <script>
+          
+            const remarksField = document.getElementById("remarks-field");
+            const submitButton = document.getElementById("submit-button");
+            const editButton = document.getElementById("edit-button");
+            
+            // Jinja values
+            const previousRemarks = "{{profile.remarks}}";
+            const beneficiaryStatus = {{profile.is_verified | tojson}};
+            const editPermission = {{profile.edit_permission | tojson }};
+            
+            if (editPermission === false){
+              remarksField.disabled = true;
+              editButton.disabled = true;
+            }
+
+            if (beneficiaryStatus == true){
+              remarksField.disabled = true;
+              submitButton.disabled = true;
+              remarksField.value = previousRemarks || '';
+
+            }
+
+
+            editButton.addEventListener("click", () => {
+              remarksField.disabled = false;
+              submitButton.disabled = false;
+              remarksField.focus() // return the focus to the end of the remarks field.
+
+            });
+
+          
+
+          
+
+
+      </script>
       
 {% endblock %}

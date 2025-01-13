@@ -45,7 +45,11 @@ def execute_sql_select_statement(
 
 
 
-def execute_sql_commands(sql: str, vars: list | dict | None = None, fetch: bool = False) -> (RealDictRow | None):
+def execute_sql_commands(
+        sql: str, vars: list | dict | None = None,  
+        fetch: bool = False
+) -> (RealDictRow | None):
+    
     # Get the database connection. 
     conn: pg.extensions.connection = db.getconn()
     # Get the cursor object.
@@ -63,6 +67,25 @@ def execute_sql_commands(sql: str, vars: list | dict | None = None, fetch: bool 
     cur.close()
     return record
    
+
+def execute_sql_commands_with_multiple_params(
+        sql: str, vars: list | dict, 
+        template: dict,
+) -> (RealDictRow | None):
+    
+    # Get the database connection. 
+    conn: pg.extensions.connection = db.getconn()
+    # Get the cursor object.
+    cur = conn.cursor()
+    # Execute the sql command/statemnt.
+    execute_values(cur, sql, vars, template)
+    # Commit the changes.
+    conn.commit()
+    # Close the cursor.
+    cur.close()
+    # Release the connection back to the pool.
+    db.putconn(conn)
+  
 
 
 def initate_database_tables():
@@ -109,7 +132,8 @@ def initate_database_tables():
             passport_size_pic bytea not null,
 
             remarks varchar,
-            is_verified boolean not null default false
+            is_verified boolean not null default false,
+            verified_by integer not null references users(id)
         );
 
         create table if not exists beneficiary_parental_details(
@@ -139,6 +163,19 @@ def initate_database_tables():
             tenth_marksheet bytea not null,
             eleventh_marksheet bytea,
             twelveth_marksheet bytea not null
+        );
+
+        create table if not exists beneficiary_bank_details(
+            id integer references users(id) not null,
+            account_holder_name varchar not null, 
+            account_number varchar not null, 
+            ifsc_code varchar not null,
+            bank_name varchar not null, 
+            branch varchar not null, 
+            bank_address varchar not null,
+            phone_number varchar not null,
+            upi_id varchar not null, 
+            passbook bytea not null   
         );
 
         create table if not exists application_periods(
@@ -184,6 +221,17 @@ def initate_database_tables():
             sponsor_id integer references users(id),
             amount numeric not null,
             transfered_at timestamp not null
+        );
+
+        create table if not exists beneficiary_assignments(
+            beneficiary_id integer references users(id) not null,
+            volunteer_id integer references users(id) not null,
+            assigned_by integer references users(id) not null,
+            assigned_at timestamp not null default 'now()',
+            verification_status varchar default 'pending',
+            verified_at timestamp
+
+            --unique(beneficiary_id, volunteer_id)
         );
     """
 
