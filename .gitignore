@@ -179,3 +179,5 @@ tables.txt
 task.txt
 static/nagarjun_profile.jpg
 templates/sample.html
+data
+uploader.py

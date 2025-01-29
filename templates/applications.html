@@ -2,90 +2,175 @@
 
 {% block title %} Applications {% endblock %}
 
-{% block content %} 
-    
-    <h1 class="text-center text-2xl mt-20 lg:text-3xl text-gray-950 font-bold">Applications</h1>
-    <div class="grid grid-cols-1 gap-6 m-10 sm:grid-cols-2 lg:grid-cols-3 font-mono">
-        {% for application in applications %}
-        <div class="flex flex-col bg-slate-50 rounded-lg shadow-md shadow-gray-900">
-            <!-- Profile Section -->
-            <div id="basic_details" class="flex flex-col flex-grow gap-0.5 p-4 items-center text-center text-indigo-800">
-                <img src="/admin_and_volunteer/beneficiary_profile_pic/{{ application.beneficiary_id }}"
-                    class="w-[150px] h-[150px] lg:w-[200px] lg:h-[200px] mt-2.5 rounded-full border-2 border-white shadow-md shadow-gray-800"
-                    alt="" title="profile picture">
-                    <h3 class="text-xl font-bold mt-2 text-emerald-600">{{ application.name }}</h3>
-                    <p class="italic"><span class="font-bold">{{ application.degree }}</span> - {{ application.course }}</p>
-                    <p class="italic">{{ application.department }}</p>
-                    <p class="italic">{{ application.college_name }}</p>
-            </div>
-
-            <!-- Expandable Application Details -->
-            <div x-data="{ expanded: false }" class="flex flex-col gap-0.5 px-4 py-2">
-                <button 
-                    @click="expanded = !expanded" 
-                    class="text-emerald-600 hover:text-red-600 flex items-center justify-start gap-2 text-sm font-medium">
-                    <span x-show="!expanded">> Show Application Details</span>
-                    <span x-show="expanded">> Hide Application Details</span>
-                </button>
-                <div x-show="expanded" x-cloak class="mt-4">
-                    <h1 class="text-lg text-center font-mono text-red-500 underline mb-1">Applications Details</h1>
-                    <p class="text-sm"><strong>Beneficiary Status:</strong> {{ application.beneficiary_status }}</p>
-                    <p class="text-sm"><strong>Parent Status:</strong> {{ application.parental_status }}</p>
-                    <p class="text-sm"><strong>House Status:</strong> {{ application.house_status }}</p>
-                    <p class="text-sm"><strong>Income:</strong> {{ application.total_annual_family_income }}</p>
-
-                    <!-- Nested Expandable Section: Special Consideration -->
-                    <div x-data="{ specialExpanded: false }" class="mt-2">
-                        <button 
-                            @click="specialExpanded = !specialExpanded" 
-                            class="text-blue-500 hover:text-red-500 text-sm flex items-center justify-start gap-2">
-                            <span x-show="!specialExpanded">> Show Special Consideration</span>
-                            <span x-show="specialExpanded">> Hide Special Consideration</span>
-                        </button>
-                        <div x-show="specialExpanded" x-cloak class="mt-2">
-                            <p class="text-sm"><strong>Special Consideration:</strong> [{{ application.special_consideration }}]</p>
-                        </div>
-                    </div>
-
-                    <!-- Nested Expandable Section: Reason -->
-                    <div x-data="{ reasonExpanded: false }" class="mt-2">
-                        <button 
-                            @click="reasonExpanded = !reasonExpanded" 
-                            class="text-blue-500 hover:text-red-500 text-sm flex items-center justify-start gap-2">
-                            <span x-show="!reasonExpanded">> Show Reason</span>
-                            <span x-show="reasonExpanded">> Hide Reason</span>
-                        </button>
-                        <div x-show="reasonExpanded" x-cloak class="mt-2 mb-4">
-                            <p class="text-sm"><strong>Reason for Assistance:</strong> {{ application.reason_for_expecting_financial_assistance }}</p>
-                        </div>
-                    </div>
-
-                    <div id="mark_details" class="text-sm">
-                        <p><strong>Latest Sem Percentage:</strong> {{ application.latest_sem_perc }}</p>
-                        <p><strong>Previous Sem Percentage:</strong> {{ application.previous_sem_perc }}</p>
-                        <p><strong>Difference Sem Percentage:</strong> {{ application.difference_in_sem_perc }}</p>
-                        <p><strong>Failed Last Semester:</strong> {{ application.have_failed_in_any_subject_in_last_2_sem }}</p>
-                        <p><strong>Current Semester:</strong> {{ application.current_semester }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Marksheet Section -->
-            <div x-data="{ marksheetExpanded: false }" class="flex flex-col gap-0.5 px-4 py-2">
-                <button 
-                    @click="marksheetExpanded = !marksheetExpanded" 
-                    class="text-emerald-600 hover:text-red-600 flex items-center justify-start gap-2 text-sm font-medium">
-                    <span x-show="!marksheetExpanded">> Show Marksheets</span>
-                    <span x-show="marksheetExpanded">> Hide Marksheets</span>
-                </button>
-                <div x-show="marksheetExpanded" x-cloak class="mt-2 flex flex-col items-end italic">
-                    <a target="_blank" href="/admin_and_volunteer/application/uploads?beneficiary_id={{ application.beneficiary_id }}&current_semester={{ application.current_semester }}&document=latest_sem_marksheet" class="text-blue-600 hover:text-red-600 underline"><p>Latest Sem Marksheet</p></a>
-                    <a target="_blank" href="/admin_and_volunteer/application/uploads?beneficiary_id={{ application.beneficiary_id }}&current_semester={{ application.current_semester }}&document=previous_sem_marksheet" class="text-blue-600 hover:text-red-600  underline"><p>Previous Sem Marksheet</p></a>
-                    <a target="_blank" href="/admin_and_volunteer/application/uploads?beneficiary_id={{ application.beneficiary_id }}&current_semester={{ application.current_semester }}&document=bonafide_or_fee_paid_proof" class="text-blue-600 hover:text-red-600 underline"><p>Bonafide or Fee Paid</p></a>
-                </div>
-            </div>
+{% block content %}
+         
+      <!-- Filter Section  -->
+      <form method="get" class="grid grid-cols-1 mt-20 mx-10 gap-2 sm:grid-cols-12 sm:gap-3 justify-center items-center">
+        
+        <div class="flex flex-col gap-0.5 sm:col-span-3" id="name-div">
+          <label for="name">Name</label>
+          <input type="search" name="name" id="name" placeholder="Nagarjun" class="rounded-lg focus:ring-1 focus:ring-indigo-600 shadow-gray-900 shadow-md">
         </div>
-        {% endfor %}
-    </div>
-{% endblock %}
 
+        <div class="flex flex-col gap-0.5 sm:col-span-3" id="email-div">
+          <label for="email_id">Email Id</label>
+          <input type="search" name="email_id" id="email_id" placeholder="nagarjun1@gmail.com" class="rounded-lg focus:ring-1 focus:ring-indigo-600 shadow-gray-900 shadow-md">
+        </div>
+
+        <div class="flex flex-col gap-0.5 sm:col-span-3" id="name-div">
+            <label for="name">Beneficiary Status</label>
+            <select name="beneficiary_status" id="beneficiary_status" class="rounded-lg shadow-gray-800 shadow-md"></select>
+        </div>
+  
+        <div class="flex flex-col gap-0.5 sm:col-span-3" id="semester-div">
+            <label for="semester">Semester</label>
+            <select name="semester" id="semester" class="rounded-lg shadow-gray-800 shadow-md"></select>
+        </div>
+
+        <div class="flex flex-col gap-0.5 sm:col-span-3" id="course-div">
+          <label for="course">Course</label>
+          <select name="course" id="course" class="rounded-lg shadow-gray-800 shadow-md"></select>
+        </div>
+
+        <div class="flex flex-col gap-0.5 sm:col-span-3" id="location-div">
+          <label for="location">Location</label>
+          <select name="location" id="location" class="rounded-lg shadow-gray-800 shadow-md"></select>
+        </div>
+        
+        <div class="flex flex-col gap-0.5 sm:col-span-3" id="college-div">
+          <label for="college">College</label>
+          <select name="college_name" id="college_name" class="rounded-lg shadow-gray-800 shadow-md"></select>
+        </div>
+
+        <!-- <div class="flex flex-col gap-0.5 sm:col-span-3" id="application_status-div">
+          <label for="application_status">Application Status</label>
+          <select name="application_status" id="application_status" class="rounded-lg shadow-gray-800 shadow-md">
+              <option value="Select">Select</option>
+              <option value="verified">Verified</option>
+              <option value="not verified" selected>Not Verified</option>
+          </select>
+        </div> -->
+
+        <!-- <div class="flex flex-col gap-0.5 sm:col-span-3" id="application_handler-div">
+          <label for="application_handler">Application Handler</label>
+          <select name="application_handler" id="application_handler" class="rounded-lg shadow-gray-800 shadow-md"></select>
+          
+        </div> -->
+        
+        <div class="sm:col-span-3 grid grid-cols-2 gap-2">
+          <div class="flex flex-col justify-center gap-0.5 sm:col-span-1 mt-2 sm:mt-5">
+            <button class="bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg p-[10px]" type="submit">Submit</button>
+          </div>
+  
+          <div class="flex flex-col justify-center gap-0.5 sm:col-span-1 mt-2 sm:mt-5">
+            <button id="reset_button" class="bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg p-[10px]" type="reset">Reset</button>
+          </div>
+        </div>
+  
+      </form>
+      
+      
+
+        <div class="mt-5 text-center text-xl">
+            <!-- <h1>200 out of 600</h1> -->
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mt-5 mx-5">
+            {% for application in applications %}
+            <div id="full_card" class="relative flex flex-col gap-1 justify-center items-center text-center border-2 p-2 rounded-lg bg-slate-50 shadow-lg shadow-gray-800">
+              <p class="absolute right-0 top-0 px-2 text-xl font-bold text-green-700">{{application.current_semester}}</p>
+              <img src="/admin_and_volunteer/beneficiary_profile_pic/{{application.beneficiary_id}}" alt="" class="w-[150px] h-[150px] lg:w-[200px] lg:h-[200px] rounded-full shadow-md border-2 border-white"><div class="flex flex-col gap-0.5 flex-grow">
+              <div class="flex flex-col gap-1  flex-grow">
+                <h1 class="text-xl text-emerald-600 mt-2">{{application.name}}</h1>
+                <p class="text-gray-950">({{application.degree}}) - {{application.course}}</p>
+                <p class="text-indigo-600">{{application.department}}</p>
+                <p class="text-red-500 italic ">{{application.college_name}}</p>
+              </div>
+              <p class="font-bold text-gray-950 text-center">{{application.beneficiary_status}} Beneficiary</p>
+            </div>               
+            <div class="mt-2 mb-2">
+                  <a href="/admin_and_volunteer/application/explore/{{application.beneficiary_id}}?application_period_id={{application.application_period_id}}" class="bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-medium py-2 px-4 rounded-lg shadow-md">More</a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        
+        <script>
+            document.addEventListener("DOMContentLoaded", async () => {
+
+              // fetch the filter values from the endpoint 
+              const response = await fetch("/admin_and_volunteer/application_filters");
+              const filterValues = await response.json();
+
+              if (filterValues){
+                    // Inject values dynamically into dropdowns
+                    function populateDropdown(dropdown, values, placeholder) {
+                        // dropdown.innerHTML = ""; // Clear existing options
+                        const defaultOption = document.createElement("option");
+                        if (placeholder === "0"){
+                          defaultOption.value = "0"
+                        }
+                        else{
+                          defaultOption.value = "";
+                        }
+                        defaultOption.textContent = "Select";
+                        dropdown.appendChild(defaultOption);
+
+                        values.forEach(value => {
+                            const option = document.createElement("option");
+                            option.value = value;
+                            option.textContent = value;
+                            dropdown.appendChild(option);
+                        });
+                    }
+
+
+                      // Dom Selection.
+                      const nameField = document.getElementById("name");
+                      const emailField = document.getElementById("email_id");
+                      const beneficiaryStatusField = document.getElementById("beneficiary_status");
+                      const semesterField = document.getElementById("semester");
+                      const courseField = document.getElementById("course");
+                      const locationField = document.getElementById("location");
+                      const collegeField = document.getElementById("college_name");
+
+                      populateDropdown(beneficiaryStatusField, filterValues.beneficiary_status, "Select");
+                      populateDropdown(semesterField, filterValues.current_semester, "0");
+                      populateDropdown(courseField, filterValues.course_and_department, "Select");
+                      populateDropdown(locationField, filterValues.district, "Select");
+                      populateDropdown(collegeField, filterValues.college_name, "Select");
+
+                      // Values Injected by Jinja
+                      const applicationFilterParams = {{ filter_params | tojson }};
+                      const { name, email_id, beneficiary_status, semester, course, location, college_name } = applicationFilterParams;
+
+                        // Set input values
+                        if (name) nameField.value = name;
+                        if (email_id) emailField.value = email_id;
+
+                        // Set selected dropdown options
+                        if (beneficiary_status) beneficiaryStatusField.value = beneficiary_status;
+                        if (semester) semesterField.value = semester;
+                        if (course) courseField.value = course;
+                        if (location) locationField.value = location;
+                        if (college_name) collegeField.value = college_name;
+            }
+                    
+                    
+                // Name and Email event listener.
+                emailField.addEventListener("input", () => {
+                // Check the name field have any values.
+                if (nameField.value.trim()){
+                  nameField.value = "";
+                }
+              });
+
+              nameField.addEventListener("input", () => {
+                // Check the name field have any values.
+                if (emailField.value.trim()){
+                  emailField.value = "";
+                }
+              });
+                
+            });
+        </script>
+{% endblock%}

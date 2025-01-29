@@ -57,7 +57,7 @@ def get_all_applications(
         """
     applications = execute_sql_select_statement(sql)
     # print(applications)
-    return templates.TemplateResponse("applications.html", {"request": request, "user": user, "applications": applications})
+    return templates.TemplateResponse("sample.html", {"request": request, "user": user, "applications": applications})
 
 
 @router.get("/beneficiaries")

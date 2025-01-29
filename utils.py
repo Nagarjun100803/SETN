@@ -5,7 +5,7 @@ import io
 import pandas as pd
 from database import db 
 from psycopg2.extras import execute_values
-
+from decimal import Decimal
 
 
 # Password context used to hash and verify the password to ensure security.
@@ -55,6 +55,11 @@ def get_compressed_image(
         compressed_binary_data: bytes = compressed_stream.read()
 
         return compressed_binary_data
+
+
+def custom_data_type_conversion(obj):
+    if isinstance(obj, Decimal):
+        return float(obj)
 
 
 if __name__ == '__main__':

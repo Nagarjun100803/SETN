@@ -115,3 +115,14 @@ class PasswordResetSchema(BaseModel):
 
 class RemarksSchema(BaseModel):
     remarks: str 
+
+
+class ApplicationFilterParams(BaseModel):
+    email_id: str = ""
+    name: str = ""
+    semester: int | None = None
+    beneficiary_status: str = ""
+    college_name: str = ""
+    location: str = ""
+    course: str = ""
+

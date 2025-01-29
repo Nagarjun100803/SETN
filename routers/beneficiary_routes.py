@@ -56,8 +56,8 @@ def require_complete_profile(beneficiary: schemas.TokenData = Depends(get_curren
         raise HTTPException(status_code = 307, headers = {"Location": "/parental_details"})
     if not profile['educational_detail']:
         raise HTTPException(status_code = 307, headers = {"Location": "/educational_details"})
-    if not profile['bank_detail']:
-        raise HTTPException(status_code = 307, headers = {"Location": "/bank_details"})
+    # if not profile['bank_detail']:
+    #     raise HTTPException(status_code = 307, headers = {"Location": "/bank_details"})
 
 
 def get_profile_status(beneficiary: schemas.TokenData = Depends(get_current_beneficiary)) -> bool:
@@ -347,7 +347,7 @@ async def create_educational_details(
 
     new_data: None = execute_sql_commands(sql, data)
 
-    return RedirectResponse("/bank_details", status_code = status.HTTP_302_FOUND)
+    return RedirectResponse("/financial_assistance_application", status_code = status.HTTP_302_FOUND)
 
 @router.post("/financial_assistance_application")
 async def create_financial_assistance_form(

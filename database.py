@@ -211,16 +211,20 @@ def initate_database_tables():
             bonafide_or_fee_paid_proof bytea,
 
             applied_at timestamp not null default 'now()',
-
+            reason_for_rejection varchar,
+            is_approved boolean,
+            
             unique(beneficiary_id, application_period_id)
         );
 
 
-        create table if not exists assisted_applications(
-            application_id integer references financial_assistance_applications(id),
+        create table if not exists approved_applications(
+            application_id integer references financial_assistance_applications(id) not null unique,
             sponsor_id integer references users(id),
-            amount numeric not null,
-            transfered_at timestamp not null
+            amount numeric,
+            transfered_at timestamp,
+            approved_by integer references users(id) not null,
+            approved_at timestamp not null default 'now()'
         );
 
         create table if not exists beneficiary_assignments(

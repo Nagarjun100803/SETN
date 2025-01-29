@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Application Details{% endblock %}
+
+{% block content %}
+
+{% macro create_application_details(title, application_details, beneficiary_id) %}
+<div class="col-span-1 p-4 bg-slate-100 rounded-lg shadow">
+
+      <h2 class="text-lg font-bold text-red-600 italic underline mb-4">{{title}}</h2>
+      <p><span class="font-semibold">Parental Status:</span> {{ application_details.parental_status }}</p>
+      <p><span class="font-semibold">Annual Family Income:</span> {{ application_details.total_annual_family_income }}</p>
+      <p><span class="font-semibold">House Status:</span> {{ application_details.house_status }}</p>
+      <p><span class="font-semibold">Reason for Assistance:</span> {{ application_details.reason_for_expecting_financial_assistance }}</p>
+      <p><span class="font-semibold">Special Considerations:</span> {{ application_details.special_consideration }}</p>
+      <p><span class="font-semibold">Failed Subjects:</span> {{ 'No' if not application_details.have_failed_in_any_subject_in_last_2_sem else 'Yes' }}</p>
+      <p><span class="font-semibold">Latest Semester Percentage:</span> {{ application_details.latest_sem_perc }}</p>
+      <p><span class="font-semibold">Previous Semester Percentage:</span> {{ application_details.previous_sem_perc }}</p>
+      <p><span class="font-semibold">Difference in Percentage :</span> {{ application_details.difference_in_sem_perc }}</p>
+  
+
+      <div class="mt-4 flex flex-col">
+          <p><span class="font-semibold">Academic Year: </span> {{ application_details.academic_year }}</p>
+          <p><span class="font-semibold">Semester:</span> {{ application_details.semester }}</p>
+          <p><span class="font-semibold">Applied at:</span> {{ application_details.applied_at.date() }}</p>
+      </div>
+    <div class="mt-2 flex flex-col gap-1 items-end underline italic">
+      <div class="mt-2 flex flex-col gap-1 items-end underline italic">
+        <a target="_blank" href="/admin_and_volunteer/application/uploads?beneficiary_id={{ beneficiary_id }}&current_semester={{ application_details.current_semester}}&document=latest_sem_marksheet" class="text-gray-950 py-1 hover:text-indigo-600">Latest Sem Marksheet</a>
+        <a target="_blank" href="/admin_and_volunteer/application/uploads?beneficiary_id={{ beneficiary_id }}&current_semester={{ application_details.current_semester}}&document=previous_sem_marksheet" class="text-gray-950 py-1 hover:text-indigo-600">Previous Sem Marksheet</a>
+        <a target="_blank" href="/admin_and_volunteer/application/uploads?beneficiary_id={{ beneficiary_id }}&current_semester={{ application_details.current_semester}}&document=bonafide_or_fee_paid_proof" class="text-gray-950 py-1 hover:text-indigo-600">Bonafide</a>
+      </div>
+    </div>
+
+</div>
+{% endmacro %}
+
+
+<div class="mx-auto mt-20 p-6 bg-white rounded-lg shadow-lg">
+    <!-- Header Section -->
+    <!-- <div class="flex flex-col md:flex-row justify-center items-center gap-6">
+        <div>
+          <img src="/admin_and_volunteer/beneficiary_profile_pic/{{ data.general_details.beneficiary_id }}" 
+             alt="Profile Picture" 
+             class="w-36 h-36 rounded-full shadow-lg border-2 border-gray-300">
+        </div>
+        <div>
+            <h1 class="text-2xl font-bold text-emerald-600">{{ data.general_details.full_name }}</h1>
+            <p class="text-lg text-gray-800">{{ data.general_details.degree }} - {{ data.general_details.course }}</p>
+            <p class="text-red-600">{{ data.general_details.department }}, {{ data.general_details.college_name }}</p>
+        </div>
+    </div> -->
+    <div class="flex flex-col items-center">
+      <div class="relative w-40 h-40 lg:w-52 lg:h-52 mb-6">
+        <img
+          src="/admin_and_volunteer/beneficiary_profile_pic/{{ data.general_details.beneficiary_id }}"
+          alt="Profile Picture"
+          class="w-[150px] h-[150px] lg:w-[200px] lg:h-[200px]  rounded-full shadow-lg border-2 border-white hover:shadow-2xl transition-all"
+        />
+      </div>
+      <h1 class="text-2xl lg:text-3xl font-bold text-indigo-800">{{ data.general_details.full_name }}</h1>
+      <p class="text-md lg:text-lg text-center">{{ data.general_details.degree }} - {{ data.general_details.course }}</p>
+      <p class="text-md lg:text-lg text-center text-gray-950">{{ data.general_details.department }}</p>
+      <p class="text-md lg:text-lg text-center text-red-600">{{ data.general_details.college_name }}</p>
+    </div>
+  
+
+
+    <!-- // Application Sections -->
+    <div class="grid grid-cols-1 {% if data.previous_application_details %} sm:grid-cols-2 {% endif %} gap-4 mt-10">
+        {% if data.previous_application_details %}
+            {{create_application_details("Previous Application Details", data.previous_application_details, data.general_details.beneficiary_id)}}
+            {{create_application_details("Current Application Details", data.current_application_details, data.general_details.beneficiary_id)}}
+        {% else %}
+            {{create_application_details("Current Application Details", data.current_application_details, data.general_details.beneficiary_id)}}
+        {% endif %}
+    </div>
+    
+    <form method="post" id="remarks_form" name="remarks_form" class="mt-10">
+         <!-- Input Fields Section -->
+          <h2 class="text-lg font-bold text-gray-900">Remarks</h2>
+          <textarea name="remarks" 
+                    rows="3"
+                    id="remarks_field" 
+                    class="w-full p-3 mt-2 bg-gray-50 border rounded-lg shadow-sm" 
+                    placeholder="Enter remarks for this application"
+                    required
+                    >
+          </textarea>
+          <input type="number" value="{{data.current_application_details.application_period_id}}" name="application_period_id" id="application_period_id" class="hidden">
+          <input type="number" value="{{data.current_application_details.id}}" name="application_id" id="application_id" class="hidden">
+      </form>
+
+    <form method="post" name="reject_form" id="reject_form">
+      <h2 class="text-lg font-bold text-gray-900 mt-6">Reason for Rejection</h2>
+          <textarea name="reason_for_rejection" 
+                    id="rejection_reason"
+                    rows="2" 
+                    class="w-full p-3 mt-2 bg-gray-50 border rounded-lg shadow-sm" 
+                    placeholder="Provide a reason for rejection if applicable"></textarea>
+          <small id="rejection_reason_error_msg" class="text-red-600 hidden"></small>
+          <input type="number" value="{{data.current_application_details.application_period_id}}" name="application_period_id" id="application_period_id" class="hidden">
+          <input type="number" value="{{data.current_application_details.id}}" name="application_id" id="application_id" class="hidden">
+
+      </form>
+     
+
+      <!-- Action Buttons -->
+      <div class="flex justify-between gap-4 mt-6">
+          <button type="submit" form="reject_form" class="px-6 py-2 text-white bg-red-500 rounded-lg hover:bg-red-600">Reject</button>
+          <button type="submit" form="remarks_form" class="px-6 py-2 text-white bg-emerald-500 rounded-lg hover:bg-emerald-600">Accept</button>
+      </div>
+
+
+
+</div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const remarksField = document.getElementById("remarks_field");
+            const rejectionReasonField = document.getElementById("rejection_reason");
+            const rejectionErrorMsgField = document.getElementById("rejection_reason_error_msg");
+
+            const remarsForm = document.getElementById("remarks_form");
+            const rejectForm = document.getElementById("reject_form");
+
+            const previousRemarks = "{{ data.general_details.remarks }}";
+            
+            if (previousRemarks){
+              remarksField.value = previousRemarks;
+            }
+
+
+            remarsForm.addEventListener("submit", (event) => {
+                if (remarksField.value.trim() === ''){
+                    event.preventDefault();
+                    remarsForm.focus();
+                }
+            });
+            
+            rejectForm.addEventListener("submit", (event) => {
+                if (rejectionReasonField.value.trim() === ''){
+                  event.preventDefault();
+                  rejectionErrorMsgField.textContent = "Please add a reason for rejection";
+                  rejectionErrorMsgField.classList.remove("hidden");
+                  rejectionReasonField.focus();
+                }
+            });
+
+
+
+
+        });
+
+    </script>
+
+{% endblock %}

@@ -7,7 +7,7 @@ templates = Jinja2Templates(directory = './templates')
 
 
 
-def get_user(by: Literal['email_id', 'id'], value: str) -> RealDictRow | None :
+def get_user(by: Literal['email_id', 'id'], value: str | int) -> RealDictRow | None :
     
     email_sql: str = "select * from users where email_id = %(email_id)s;"
     id_sql: str = "select * from users where id = %(id)s"
