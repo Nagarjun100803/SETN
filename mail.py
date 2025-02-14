@@ -2,21 +2,22 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.utils import formataddr
+from config import settings
 
-EMAIL_ID = 'anandnagarjun5@gmail.com'
-EMAIL_PASSWORD = 'teib fjhx ghfj zvzi'
-EMAIL_SERVER_PORT = 587
+# EMAIL_ID = 'anandnagarjun5@gmail.com'
+# EMAIL_PASSWORD = 'teib fjhx ghfj zvzi'
+# EMAIL_SERVER_PORT = 587
 
 
 
 # Function to initialize the email server
 def initialize_email_server():
     try:
-        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server = smtplib.SMTP("smtp.gmail.com", settings.email_server_port)
         server.ehlo()
         server.starttls()  # Secure the connection
         server.ehlo()
-        server.login(EMAIL_ID, EMAIL_PASSWORD)
+        server.login(settings.sender_email_id, settings.sender_email_password)
         return server
     
     except Exception as e:
@@ -31,7 +32,7 @@ def send_email(server, recipient_email: str, subject: str, html_content: str):
     try:
         # Create the email
         msg = MIMEMultipart()
-        msg["From"] = formataddr(("SETN Support", EMAIL_ID))
+        msg["From"] = formataddr(("SETN Support", settings.sender_email_id))
         msg["To"] = recipient_email
         msg["Subject"] = subject
 
@@ -39,7 +40,7 @@ def send_email(server, recipient_email: str, subject: str, html_content: str):
         msg.attach(MIMEText(html_content, "html"))
 
         # Send the email
-        server.sendmail(EMAIL_ID, recipient_email, msg.as_string())
+        server.sendmail(settings.sender_email_id, recipient_email, msg.as_string())
         print("Email sent successfully to", recipient_email)
     except Exception as e:
         print("Error sending email:", e)
@@ -48,7 +49,7 @@ def send_email(server, recipient_email: str, subject: str, html_content: str):
 
 def send_reset_password_email(token: str, recipent_email: str):
 
-    reset_url = f"http://localhost:8000/reset_password?token={token}"
+    reset_url = f"{settings.base_url}/reset_password?token={token}"
     html_content = f"""
     <html>
     <body>

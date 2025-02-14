@@ -2,21 +2,24 @@ import psycopg2 as pg
 from psycopg2.pool import SimpleConnectionPool
 from psycopg2.extras import RealDictCursor, RealDictRow, execute_values 
 from typing import Any
+from config import settings
 
 
 # Connection parameters.
 connection_params: dict[str, Any] = {
-    # 'database': 'souglobal',
-    'database': 'setn',
-    'password': 'arju@123',
-    'user': 'postgres', 
-    'cursor_factory': RealDictCursor  
+    "database": settings.db_name,
+    "password": settings.db_password,
+    "user": settings.db_user, 
+    'cursor_factory': RealDictCursor,
+    "host": settings.db_host,
+    "port": settings.db_port 
 }
 
 # Create a database pool to create and store the connections.
 db: SimpleConnectionPool = SimpleConnectionPool(
     minconn = 4, maxconn = 12, **connection_params 
 )
+
 
 # conn: pg.extensions.connection =  pg.connect(**connection_params, cursor_factory = RealDictCursor)
 # print(db)
@@ -107,9 +110,18 @@ def initate_database_tables():
             end_date date not null,
             place varchar,
             links varchar,
-            posted_at timestamp not null default 'now()'
+            posted_at timestamp not null default now()
 
         );
+
+        create table if not exists sponsors(
+            id serial primary key,
+            full_name varchar(300) not null, 
+            phone_num varchar(12) not null,
+            location varchar not null,
+            country varchar not null,
+            average_contribution numeric not null
+        ); 
 
         create table if not exists users(
             id serial primary key,
@@ -117,7 +129,7 @@ def initate_database_tables():
             username varchar(100) not null,
             email_id varchar(100) not null unique,
             password varchar not null,
-            created_at timestamp not null default 'now()'
+            created_at timestamp not null default now()
         );
 
         create table if not exists beneficiary_personal_details(
@@ -133,7 +145,7 @@ def initate_database_tables():
 
             remarks varchar,
             is_verified boolean not null default false,
-            verified_by integer not null references users(id)
+            verified_by integer references users(id)
         );
 
         create table if not exists beneficiary_parental_details(
@@ -184,7 +196,7 @@ def initate_database_tables():
             semester varchar(30) not null,
             start_date date not null,
             end_date date not null,
-            opened_at timestamp not null default 'now()'
+            opened_at timestamp not null default now()
         );
 
         create table if not exists financial_assistance_applications(
@@ -199,7 +211,7 @@ def initate_database_tables():
 
             reason_for_expecting_financial_assistance varchar not null, 
             special_consideration text not null,
-            have_failed_in_any_subject_in_last_2_sem boolean default 'false',
+            have_failed_in_any_subject_in_last_2_sem boolean default false,
 
             latest_sem_perc numeric not null,
             previous_sem_perc numeric not null,
@@ -209,10 +221,12 @@ def initate_database_tables():
             latest_sem_marksheet bytea not null,
             previous_sem_marksheet bytea not null,
             bonafide_or_fee_paid_proof bytea,
-
-            applied_at timestamp not null default 'now()',
+            applied_at timestamp not null default now(),
+            
             reason_for_rejection varchar,
-            is_approved boolean,
+            is_verified boolean default false,
+            verified_by integer references users(id),
+            verified_at timestamp,
             
             unique(beneficiary_id, application_period_id)
         );
@@ -220,23 +234,31 @@ def initate_database_tables():
 
         create table if not exists approved_applications(
             application_id integer references financial_assistance_applications(id) not null unique,
-            sponsor_id integer references users(id),
+            sponsor_id integer references sponsors(id),
             amount numeric,
-            transfered_at timestamp,
-            approved_by integer references users(id) not null,
-            approved_at timestamp not null default 'now()'
+            transfered_at timestamp
         );
 
         create table if not exists beneficiary_assignments(
             beneficiary_id integer references users(id) not null,
             volunteer_id integer references users(id) not null,
             assigned_by integer references users(id) not null,
-            assigned_at timestamp not null default 'now()',
+            assigned_at timestamp not null default now(),
             verification_status varchar default 'pending',
             verified_at timestamp
 
             --unique(beneficiary_id, volunteer_id)
         );
+
+        create table if not exists admin_volunteer(
+            id integer references users(id),
+            full_name varchar(100) not null,
+            phone_num varchar(10) not null,
+            place varchar,
+            created_at timestamp not null default now()
+        );
+
+
     """
 
     execute_sql_commands(tables)

@@ -5,13 +5,14 @@ from fastapi import HTTPException, Request, Security, status, Depends
 from fastapi.security.utils import get_authorization_scheme_param
 from fastapi.openapi.models import OAuthFlows as OAuthFlowsModel
 import schemas
-from config import get_user
+from utils import get_user
+from config import settings
 
 
 
-EXPIRE_MINUTES = 100
-SECRET_KEY = 'shiva'
-ALGORIHM = 'HS256'
+# EXPIRE_MINUTES = 100
+# SECRET_KEY = 'shiva'
+# ALGORIHM = 'HS256'
 
 
 
@@ -50,10 +51,10 @@ oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl='signin')
 def create_access_token(payload: dict) -> str:
 
     new_payload = payload.copy()
-    expiration = datetime.utcnow() + timedelta(minutes = EXPIRE_MINUTES)
+    expiration = datetime.utcnow() + timedelta(minutes = settings.jwt_token_expire_minutes)
     new_payload.update({'exp': expiration})
 
-    encoded_payload = jwt.encode(new_payload, SECRET_KEY, algorithm = ALGORIHM)
+    encoded_payload = jwt.encode(new_payload, key = settings.jwt_token_secret_key, algorithm = settings.jwt_token_algorithm)
 
     return encoded_payload
 
@@ -61,7 +62,7 @@ def create_access_token(payload: dict) -> str:
 
 def get_current_user(token: str = Security(oauth2_scheme)) -> schemas.TokenData:
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORIHM])
+        payload = jwt.decode(token, settings.jwt_token_secret_key, algorithms=[settings.jwt_token_algorithm])
         user = get_user('id', value=payload.get('id'))
         if not user:
             raise HTTPException(

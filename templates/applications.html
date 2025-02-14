@@ -21,7 +21,16 @@
             <label for="name">Beneficiary Status</label>
             <select name="beneficiary_status" id="beneficiary_status" class="rounded-lg shadow-gray-800 shadow-md"></select>
         </div>
-  
+        
+        <div class="flex flex-col gap-0.5 sm:col-span-3" id="application_status-div">
+          <label for="application_status">Application Status</label>
+          <select name="application_status" id="application_status" class="rounded-lg shadow-gray-800 shadow-md">
+              <option value="">Select</option>
+              <option value="false">Not Verified</option>
+              <option value="true">Verified</option>
+          </select>
+        </div>
+
         <div class="flex flex-col gap-0.5 sm:col-span-3" id="semester-div">
             <label for="semester">Semester</label>
             <select name="semester" id="semester" class="rounded-lg shadow-gray-800 shadow-md"></select>
@@ -42,21 +51,18 @@
           <select name="college_name" id="college_name" class="rounded-lg shadow-gray-800 shadow-md"></select>
         </div>
 
-        <!-- <div class="flex flex-col gap-0.5 sm:col-span-3" id="application_status-div">
-          <label for="application_status">Application Status</label>
-          <select name="application_status" id="application_status" class="rounded-lg shadow-gray-800 shadow-md">
-              <option value="Select">Select</option>
-              <option value="verified">Verified</option>
-              <option value="not verified" selected>Not Verified</option>
-          </select>
-        </div> -->
 
-        <!-- <div class="flex flex-col gap-0.5 sm:col-span-3" id="application_handler-div">
-          <label for="application_handler">Application Handler</label>
-          <select name="application_handler" id="application_handler" class="rounded-lg shadow-gray-800 shadow-md"></select>
-          
-        </div> -->
-        
+
+        <!-- {% if user.role == 'admin' %}
+          <div class="flex flex-col gap-0.5 sm:col-span-3" id="application_handler-div">
+            <label for="application_handler">Application Handler</label>
+            <select name="application_handler" id="application_handler" class="rounded-lg shadow-gray-800 shadow-md">
+                <option value="">Select</option>
+                <option value="admin">Admin</option>
+                <option value="volunteer">Volunteer</option>
+            </select>
+          </div>
+        {% endif %} -->
         <div class="sm:col-span-3 grid grid-cols-2 gap-2">
           <div class="flex flex-col justify-center gap-0.5 sm:col-span-1 mt-2 sm:mt-5">
             <button class="bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg p-[10px]" type="submit">Submit</button>
@@ -74,21 +80,34 @@
         <div class="mt-5 text-center text-xl">
             <!-- <h1>200 out of 600</h1> -->
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mt-5 mx-5">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-5 mx-5 mb-20">
             {% for application in applications %}
             <div id="full_card" class="relative flex flex-col gap-1 justify-center items-center text-center border-2 p-2 rounded-lg bg-slate-50 shadow-lg shadow-gray-800">
-              <p class="absolute right-0 top-0 px-2 text-xl font-bold text-green-700">{{application.current_semester}}</p>
+              <p class="absolute right-0 top-0 px-2 text-lg sm:text-xl font-semibold text-amber-600">{{application.current_semester}}</p>
               <img src="/admin_and_volunteer/beneficiary_profile_pic/{{application.beneficiary_id}}" alt="" class="w-[150px] h-[150px] lg:w-[200px] lg:h-[200px] rounded-full shadow-md border-2 border-white"><div class="flex flex-col gap-0.5 flex-grow">
-              <div class="flex flex-col gap-1  flex-grow">
+              <div class="flex flex-col gap-1 flex-grow">
                 <h1 class="text-xl text-emerald-600 mt-2">{{application.name}}</h1>
-                <p class="text-gray-950">({{application.degree}}) - {{application.course}}</p>
-                <p class="text-indigo-600">{{application.department}}</p>
-                <p class="text-red-500 italic ">{{application.college_name}}</p>
+                <p class="">({{application.degree}}) - {{application.course}}</p>
+                <p class="text-indigo-500">{{application.department}}</p>
+                <p class="text-red-600">{{application.college_name}}</p>
               </div>
-              <p class="font-bold text-gray-950 text-center">{{application.beneficiary_status}} Beneficiary</p>
+                <p class="font-bold text-gray-950 text-center">{{application.beneficiary_status}} Beneficiary</p>
+                <p>Application Status: 
+                  {% if application.status %}
+                    <span class="text-green-700 font-medium"> Verified</span>
+                  {% else %}
+                    <span class="text-red-700 font-medium"> Not Verified</span>
+                  {% endif %}
+               </p>
             </div>               
-            <div class="mt-2 mb-2">
-                  <a href="/admin_and_volunteer/application/explore/{{application.beneficiary_id}}?application_period_id={{application.application_period_id}}" class="bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-medium py-2 px-4 rounded-lg shadow-md">More</a>
+            <div class="m-4">
+                  <a href="/admin_and_volunteer/application/explore/{{application.beneficiary_id}}?application_period_id={{application.application_period_id}}" class="bg-indigo-500 hover:bg-indigo-600 text-white py-2 px-4 rounded-lg shadow-md">
+                        {% if application.status %} 
+                          View
+                        {% else %}
+                          Verify
+                        {% endif %}
+                  </a>
               </div>
             </div>
           {% endfor %}
@@ -106,12 +125,12 @@
                     function populateDropdown(dropdown, values, placeholder) {
                         // dropdown.innerHTML = ""; // Clear existing options
                         const defaultOption = document.createElement("option");
-                        if (placeholder === "0"){
-                          defaultOption.value = "0"
-                        }
-                        else{
+                        // if (placeholder === "0"){
+                        //   defaultOption.value = "0";
+                        // }
+                        // else{
                           defaultOption.value = "";
-                        }
+                        // }
                         defaultOption.textContent = "Select";
                         dropdown.appendChild(defaultOption);
 
@@ -132,6 +151,7 @@
                       const courseField = document.getElementById("course");
                       const locationField = document.getElementById("location");
                       const collegeField = document.getElementById("college_name");
+                      const applicationStatusField = document.getElementById("application_status");
 
                       populateDropdown(beneficiaryStatusField, filterValues.beneficiary_status, "Select");
                       populateDropdown(semesterField, filterValues.current_semester, "0");
@@ -141,7 +161,7 @@
 
                       // Values Injected by Jinja
                       const applicationFilterParams = {{ filter_params | tojson }};
-                      const { name, email_id, beneficiary_status, semester, course, location, college_name } = applicationFilterParams;
+                      const { name, email_id, beneficiary_status, semester, course, location, college_name, application_status } = applicationFilterParams;
 
                         // Set input values
                         if (name) nameField.value = name;
@@ -153,6 +173,7 @@
                         if (course) courseField.value = course;
                         if (location) locationField.value = location;
                         if (college_name) collegeField.value = college_name;
+                        if (application_status) applicationStatusField.value = application_status;
             }
                     
                     

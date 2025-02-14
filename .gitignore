@@ -181,3 +181,5 @@ static/nagarjun_profile.jpg
 templates/sample.html
 data
 uploader.py
+bank_detail_uploader.html
+bank_routes.py

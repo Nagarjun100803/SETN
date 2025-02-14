@@ -5,10 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %} SETN {% endblock %}</title>
   <link rel="stylesheet" href="/static/output.css">
-  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
 </head>
-<body class="font-mono">
+<body class="font-serif text-xs sm:text-sm lg:text-base">
   <!-- Navbar -->
   <header class="bg-white shadow-md fixed w-full top-0 left-0 z-10">
     <div class="grid grid-cols-2 md:grid-cols-3 items-center gap-4 p-4">
@@ -23,16 +22,16 @@
         <a href="#" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700">Home</a>
         <a href="#" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700">About</a>
         <a href="#" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700">History</a>
-        <a href="/financial_assistance_application" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700">Application</a>
+        <a href="/beneficiary/financial_assistance_application" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700">Application</a>
         
         {% elif user and user.role == 'admin' %}
-        <a href="/admin_and_volunteer/all_applications" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700">Applications</a>
+        <a href="/admin_and_volunteer/applications" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700">Applications</a>
         <a href="/admin/beneficiaries" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700">Beneficiaries</a>
         <a href="/admin/assign_beneficiaries" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700 text-nowrap">Assign</a>
         <a href="#" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700 text-wrap">Dashboard</a>
         
         {% elif user and user.role == 'volunteer' %}
-        <a href="/admin_and_volunteer/all_applications" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700 text-nowrap">Applications</a>
+        <a href="/admin_and_volunteer/applications" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700 text-nowrap">Applications</a>
         <a href="/volunteer/beneficiaries" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700 text-nowrap">Beneficiaires</a>
         <a href="#" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700 text-nowrap">History</a>
         
@@ -71,21 +70,19 @@
       <nav class="p-4 space-y-4 text-center">
         
         {% if user and user.role == 'beneficiary' %}
-        <a href="#" class="block text-emerald-600">Home</a>
-        <a href="#" class="block text-emerald-600">About</a>
-        <a href="#" class="block text-emerald-600">History</a>
-        <a href="/financial_assistance_application" class="block text-emerald-600">Application</a>
+            <a href="#" class="block text-emerald-600">Home</a>
+            <a href="#" class="block text-emerald-600">About</a>
+            <a href="#" class="block text-emerald-600">History</a>
+            <a href="/beneficiary/financial_assistance_application" class="block text-emerald-600">Application</a>
         {% elif user and user.role == 'admin' %}
-        <a href="/admin_and_volunteer/all_applications" class="block text-emerald-600">Applications</a>
-        <a href="/admin/beneficiaries" class="block text-emerald-600">Beneficiaries</a>
-        <a href="/admin/assign_beneficiaries" class="block text-emerald-600">Assign</a>
-        <a href="#" class="block text-emerald-600">Dashboard</a>
-        
+            <a href="/admin_and_volunteer/applications" class="block text-emerald-600">Applications</a>
+            <a href="/admin/beneficiaries" class="block text-emerald-600">Beneficiaries</a>
+            <a href="/admin/assign_beneficiaries" class="block text-emerald-600">Assign</a>
+            <a href="#" class="block text-emerald-600">Dashboard</a> 
         {% elif user and user.role == 'volunteer' %}
-        <a href="/admin_and_volunteer/all_applications" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-70">Applications</a>
-        <a href="/volunteer/beneficiaries" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700 ">Beneficiaires</a>
-        <a href="#" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700">History</a>
-
+            <a href="/admin_and_volunteer/applications" class="block text-emerald-600">Applications</a>
+            <a href="/volunteer/beneficiaries" class="block text-emerald-600">Beneficiaires</a>
+            <!-- <a href="#" class="block text-emerald-600">History</a> -->
         {% else %}
         <a href="#" class="block text-emerald-600">Assistance</a>
         {% endif %}
@@ -111,7 +108,7 @@
   </script>
 
   <!-- Main Content -->
-  <main class="p-4 min-h-screen bg-gradient-to-bl from-emerald-100 to-amber-200">
+  <main class="py-2 min-h-screen bg-gradient-to-bl from-emerald-100 to-amber-200  text-xs sm:text-sm lg:text-base">
     {% block content %}
     <!-- Page-specific content will go here -->
     {% endblock %}

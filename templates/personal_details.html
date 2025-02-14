@@ -4,27 +4,21 @@
 
 {% block content %}
 
-    <div class="min-h-screen flex flex-col justify-center items-center m-5 mt-20">
-        {% if filled %}
-            <div>
-                <p>Already filled your Personal details</p>
-            </div>
-        {% else %}
-        
+    <div class="min-h-screen flex flex-col justify-center items-center mt-20">
         <div id="full-form" class="bg-slate-50 rounded-lg shadow-lg shadow-gray-900 lg:w-1/2">
-            <div id="form" class="font-mono italic flex flex-col gap-2 p-10">
+            <div id="form" class="flex flex-col gap-2 p-10">
                 <div id="heading-div">
                     <!-- <h1 class="text-xl text-indigo-500 font-bold italic text-center sm:text-xl lg:text-2xl">Personal Details</h1> -->
-                    <h1 class="text-xl text-gray-900 font-bold font-serif  text-center sm:text-xl lg:text-2xl">Personal Details</h1>
+                    <h1 class="text-xl text-gray-900 font-bold text-center sm:text-xl lg:text-2xl">Personal Details</h1>
                 </div>
 
                 {% if error_message %}
-                <div id="error-div" class="text-center text-sm text-red-600 font-semibold italic sm:text-lg">
+                <div id="error-div" class="text-center text-sm text-red-600 font-semibold sm:text-lg">
                     <p>{{error_message}}</p>
                 </div>
                 {% endif %}
                 
-                <form method="post" id="personal_details_form" enctype="multipart/form-data" class="grid grid-cols-1 mt-2 gap-2 sm:grid sm:grid-cols-2 sm:gap-3">
+                <form method="post" id="personal_details_form" enctype="multipart/form-data" class="grid grid-cols-1 mt-2 gap-2 sm:grid sm:grid-cols-2 sm:gap-3 p-4">
 
                     <div class="flex flex-col gap-0.5" id="initial-div">
                         <label for="initial">Initial</label>
@@ -126,7 +120,6 @@
                 });
 
                 personalDetailsForm.addEventListener("submit", (event) => {
-                    console.log('Hello');
                     if (!aadharNumberRegex.test(aadharNumber.value.trim())){
                         event.preventDefault();
                         aadharNumber.focus();
@@ -137,8 +130,8 @@
                     }  
                 });
 
-            })
+
+            });
 
     </script>
-    {% endif %}
 {% endblock %}

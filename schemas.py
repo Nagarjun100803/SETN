@@ -120,9 +120,18 @@ class RemarksSchema(BaseModel):
 class ApplicationFilterParams(BaseModel):
     email_id: str = ""
     name: str = ""
-    semester: int | None = None
     beneficiary_status: str = ""
     college_name: str = ""
     location: str = ""
     course: str = ""
+    semester: int | str = "" 
+    application_status: bool | str = False
+    application_handler: Literal["admin", "volunteer", ""] = ""
 
+
+class BeneficiaryFilterParams(BaseModel):
+
+    name: str = ""
+    email_id: str = ""
+    beneficiary_status: str | Literal["verified", "new"] = ""
+    college_name: str = ""

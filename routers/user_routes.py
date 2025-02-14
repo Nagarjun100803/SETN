@@ -4,8 +4,7 @@ import schemas, utils, oauth2
 from database import execute_sql_select_statement, execute_sql_commands
 from fastapi.responses import RedirectResponse
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
-from config import get_user
-from utils import serializer
+from utils import get_user, serializer
 from mail import send_reset_password_email
 from itsdangerous.exc import SignatureExpired, BadSignature
 

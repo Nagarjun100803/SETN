@@ -42,9 +42,9 @@
     <div class="p-4 grid grid-cols-1 mt-5 sm:grid-cols-2 lg:grid-cols-3 gap-x-2 gap-y-3">
       {% for beneficiary in beneficiaries %}
         <div class="p-4">
-          <div class="max-w-md mx-auto h-full flex flex-col justify-between">
+          <div class="mx-auto h-full flex flex-col justify-between">
             <div class="bg-slate-50 shadow-gray-700 shadow-lg rounded-lg overflow-hidden h-full flex flex-col">
-              <div class="p-4 flex flex-col items-center flex-grow">
+              <div class="p-4 flex flex-col items-center sm:flex-grow">
                 <!-- Profile Picture -->
                 <img 
                   src="/admin_and_volunteer/beneficiary_profile_pic/{{beneficiary.id}}" 
@@ -54,7 +54,7 @@
                 <!-- Beneficiary Name -->
                 <h3 class="text-xl lg:text-2xl font-semibold text-emerald-900">{{ beneficiary.name }}</h3>
                 <!-- Course and College -->
-                <div class="xs:text-sm italic mt-2 text-center sm:flex-grow">
+                <div class="xs:text-sm mt-2 text-center sm:flex-grow">
                   <p class="text-gray-950"><span class="font-bold">({{ beneficiary.degree }})</span> {{beneficiary.course }}</p>
                   <p class="text-indigo-600">({{ beneficiary.department }})</p>
                   {% if user.role == 'admin' %}
@@ -66,10 +66,10 @@
 
                 <!-- Basic Details  -->
                 <div class="flex flex-col gap-1 justify-center items-start mt-3 text-md p-3 ">
-                  <p class="font-bold"><span class="font-medium">Phone Number:</span> {{ beneficiary.phone_num }}</p>
-                  <!-- <p class="font-bold"><span class="font-medium">Aadhar Number:</span> {{ beneficiary.aadhar_num }}</p> -->
-                  <p class="font-bold "><span class="font-medium">Date of Birth:</span> {{ beneficiary.date_of_birth }}</p>
-                  <p class="font-bold"><span class="font-medium">Status:</span>
+                  <p class=""><span >Phone Number:</span> {{ beneficiary.phone_num }}</p>
+                  <!-- <p><span >Aadhar Number:</span> {{ beneficiary.aadhar_num }}</p> -->
+                  <p class=""><span >Date of Birth:</span> {{ beneficiary.date_of_birth }}</p>
+                  <p><span >Status:</span>
                     {% if beneficiary.is_verified %}
                       <span class="text-green-600">Verified</span>
                       {% else %}
@@ -79,7 +79,7 @@
                 </div>
                 <!-- Email Div -->
                 <div class="flex flex-col justify-center">
-                  <p class="font-bold text-sm underline text-clip sm:text-md ">{{beneficiary.email_id}}</p>
+                  <a class="font-bold  underline text-clip hover:text-emerald-500" href="mailto:{{beneficiary.email_id}}">{{beneficiary.email_id}}</a>
                </div>
               </div>
               <!-- "More" Button -->

@@ -5,9 +5,9 @@
 {% block content %}
 
 {% macro create_application_details(title, application_details, beneficiary_id) %}
-<div class="col-span-1 p-4 bg-slate-100 rounded-lg shadow">
+<div class="relative col-span-1 p-4 bg-slate-100 rounded-lg shadow">
 
-      <h2 class="text-lg font-bold text-red-600 italic underline mb-4">{{title}}</h2>
+      <h2 class="text-lg font-bold text-amber-400 text-center italic underline mb-4">{{title}}</h2>
       <p><span class="font-semibold">Parental Status:</span> {{ application_details.parental_status }}</p>
       <p><span class="font-semibold">Annual Family Income:</span> {{ application_details.total_annual_family_income }}</p>
       <p><span class="font-semibold">House Status:</span> {{ application_details.house_status }}</p>
@@ -24,41 +24,56 @@
           <p><span class="font-semibold">Semester:</span> {{ application_details.semester }}</p>
           <p><span class="font-semibold">Applied at:</span> {{ application_details.applied_at.date() }}</p>
       </div>
-    <div class="mt-2 flex flex-col gap-1 items-end underline italic">
-      <div class="mt-2 flex flex-col gap-1 items-end underline italic">
+
+      {% if application_details.application_status %} 
+        <div class="mt-4 flex-flex-col items-center">
+          <h1 class="font-bold text-green-700 underline">Verification Details</h1>
+          <p><span class="font-semibold">Verified By: </span>{{application_details.verifier_name}}</p>
+          <p><span class="font-semibold">Verified: </span>{{application_details.verified_at.date()}} @ {{application_details.verified_at.strftime('%I:%M %p')}}</p>
+          <p><span class="font-semibold">Conclusion: </span>
+            {{'Rejected' if application_details.reason_for_rejection else 'Accepted'}}
+          </p>
+          {% if application_details.reason_for_rejection %}
+              <p><span class="font-semibold">Reason for rejection: {{application_details.reason_for_rejection}} </span>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {% if application_details.amount %}
+        <div class="mt-4 flex flex-col">
+          <h1 class="font-bold text-green-700 underline">Sponsor Details</h1>
+          <p><span class="font-semibold">Transferred Amount: </span> {{ application_details.amount }}</p>
+          <p><span class="font-semibold">Sponsor:</span> {{ application_details.sponsor_name }}</p>
+          <p><span class="font-semibold">Sponsor Number:</span> {{ application_details.sponsor_num }}</p>
+          <p><span class="font-semibold">Location:</span> {{ application_details.sponsor_location }}</p>
+          <p><span class="font-semibold">Country:</span> {{ application_details.sponsor_country }}</p>
+          <p><span class="font-semibold">Transferred on:</span> {{ application_details.transaction_date}}</p>
+        </div>
+      {% endif %}
+
+
+      <div class="mt-2 flex flex-col gap-1 items-end underline">
         <a target="_blank" href="/admin_and_volunteer/application/uploads?beneficiary_id={{ beneficiary_id }}&current_semester={{ application_details.current_semester}}&document=latest_sem_marksheet" class="text-gray-950 py-1 hover:text-indigo-600">Latest Sem Marksheet</a>
         <a target="_blank" href="/admin_and_volunteer/application/uploads?beneficiary_id={{ beneficiary_id }}&current_semester={{ application_details.current_semester}}&document=previous_sem_marksheet" class="text-gray-950 py-1 hover:text-indigo-600">Previous Sem Marksheet</a>
         <a target="_blank" href="/admin_and_volunteer/application/uploads?beneficiary_id={{ beneficiary_id }}&current_semester={{ application_details.current_semester}}&document=bonafide_or_fee_paid_proof" class="text-gray-950 py-1 hover:text-indigo-600">Bonafide</a>
       </div>
-    </div>
+
 
 </div>
 {% endmacro %}
 
 
-<div class="mx-auto mt-20 p-6 bg-white rounded-lg shadow-lg">
+<div class="m-5 mt-20 p-6 bg-slate-50 rounded-lg shadow-lg">
     <!-- Header Section -->
-    <!-- <div class="flex flex-col md:flex-row justify-center items-center gap-6">
-        <div>
-          <img src="/admin_and_volunteer/beneficiary_profile_pic/{{ data.general_details.beneficiary_id }}" 
-             alt="Profile Picture" 
-             class="w-36 h-36 rounded-full shadow-lg border-2 border-gray-300">
-        </div>
-        <div>
-            <h1 class="text-2xl font-bold text-emerald-600">{{ data.general_details.full_name }}</h1>
-            <p class="text-lg text-gray-800">{{ data.general_details.degree }} - {{ data.general_details.course }}</p>
-            <p class="text-red-600">{{ data.general_details.department }}, {{ data.general_details.college_name }}</p>
-        </div>
-    </div> -->
     <div class="flex flex-col items-center">
-      <div class="relative w-40 h-40 lg:w-52 lg:h-52 mb-6">
+      <div class="relative w-40 h-40 lg:w-52 lg:h-52 mb-3">
         <img
           src="/admin_and_volunteer/beneficiary_profile_pic/{{ data.general_details.beneficiary_id }}"
           alt="Profile Picture"
           class="w-[150px] h-[150px] lg:w-[200px] lg:h-[200px]  rounded-full shadow-lg border-2 border-white hover:shadow-2xl transition-all"
         />
       </div>
-      <h1 class="text-2xl lg:text-3xl font-bold text-indigo-800">{{ data.general_details.full_name }}</h1>
+      <h1 class="text-lg sm:text-xl font-bold text-emerald-500">{{ data.general_details.full_name }}</h1>
       <p class="text-md lg:text-lg text-center">{{ data.general_details.degree }} - {{ data.general_details.course }}</p>
       <p class="text-md lg:text-lg text-center text-gray-950">{{ data.general_details.department }}</p>
       <p class="text-md lg:text-lg text-center text-red-600">{{ data.general_details.college_name }}</p>
@@ -75,6 +90,12 @@
             {{create_application_details("Current Application Details", data.current_application_details, data.general_details.beneficiary_id)}}
         {% endif %}
     </div>
+    
+    {% if data.current_application_details.application_status %}
+        <div class="mt-5">
+            <h1 class="text-xl sm:text-2xl xl:text-3xl font-serif text-amber-600 text-center">Application Verified</h1>
+        </div>
+    {% else %}
     
     <form method="post" id="remarks_form" name="remarks_form" class="mt-10">
          <!-- Input Fields Section -->
@@ -111,6 +132,7 @@
           <button type="submit" form="remarks_form" class="px-6 py-2 text-white bg-emerald-500 rounded-lg hover:bg-emerald-600">Accept</button>
       </div>
 
+      {% endif %}
 
 
 </div>

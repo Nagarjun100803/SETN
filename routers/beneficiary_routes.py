@@ -8,7 +8,10 @@ import pandas as pd
 
 
 
-router = APIRouter(tags = ['Beneficiary'])
+router = APIRouter(
+    prefix = "/beneficiary",
+    tags = ["Beneficiary"]
+)
 
 
 
@@ -39,10 +42,10 @@ def require_complete_profile(beneficiary: schemas.TokenData = Depends(get_curren
     """
     sql: str = """
         select 
-            (select id from beneficiary_personal_details where id = %(beneficiary_id)s) as personal_detail,
-            (select id from beneficiary_parental_details where id = %(beneficiary_id)s) as parental_detail,
-            (select id from beneficiary_educational_details where id = %(beneficiary_id)s) as educational_detail,
-            (select id from beneficiary_bank_details where id = %(beneficiary_id)s) as bank_detail
+            (select 1 from beneficiary_personal_details where id = %(beneficiary_id)s) as personal_detail,
+            (select 1 from beneficiary_parental_details where id = %(beneficiary_id)s) as parental_detail,
+            (select 1 from beneficiary_educational_details where id = %(beneficiary_id)s) as educational_detail
+            --(select 1 from beneficiary_bank_details where id = %(beneficiary_id)s) as bank_detail
         ;
     """
 
@@ -51,11 +54,11 @@ def require_complete_profile(beneficiary: schemas.TokenData = Depends(get_curren
     profile = execute_sql_select_statement(sql, vars, fetch_all = False)
 
     if not profile['personal_detail']:
-        raise HTTPException(status_code = 307, headers = {"Location": "/personal_details"})
+        raise HTTPException(status_code = 307, headers = {"Location": "/beneficiary/personal_details"})
     if not profile['parental_detail']:
-        raise HTTPException(status_code = 307, headers = {"Location": "/parental_details"})
+        raise HTTPException(status_code = 307, headers = {"Location": "/beneficiary/parental_details"})
     if not profile['educational_detail']:
-        raise HTTPException(status_code = 307, headers = {"Location": "/educational_details"})
+        raise HTTPException(status_code = 307, headers = {"Location": "/beneficiary/educational_details"})
     # if not profile['bank_detail']:
     #     raise HTTPException(status_code = 307, headers = {"Location": "/bank_details"})
 
@@ -79,12 +82,12 @@ def get_personal_details_page(
 ):
     context: dict = {"request": request, "user": user}
     # Check the user already applied the details.
-    personal_details_sql: str = "select * from beneficiary_personal_details where id = %(id)s;"
+    personal_details_sql: str = "select 1 from beneficiary_personal_details where id = %(id)s;"
     previous_record = execute_sql_select_statement(personal_details_sql, {"id": user.id}, fetch_all = False)
 
     if previous_record:
-        context.update({"filled": True})
-        return templates.TemplateResponse("personal_details.html", context)
+        context.update({"message": "Already provided your personal details.", "message_type": "Info"})
+        return templates.TemplateResponse("message.html", context)
 
     return templates.TemplateResponse("personal_details.html", context)
 
@@ -97,12 +100,12 @@ def get_parental_details_page(
 ):
     context: dict = {"request": request, "user": user}
     #check the user already submited their details.
-    parent_details_check_sql: str = """select * from beneficiary_parental_details where id = %(id)s;"""
+    parent_details_check_sql: str = """select 1 from beneficiary_parental_details where id = %(id)s;"""
     parent_details = execute_sql_select_statement(parent_details_check_sql, {'id': user.id}, fetch_all = False)
 
     if parent_details:
-        context.update({"filled": True})
-        return templates.TemplateResponse("parental_details.html", context)
+        context.update({"message": "Already provided your parental details", "message_type": "Info"})
+        return templates.TemplateResponse("message.html", context)
 
     return templates.TemplateResponse("parental_details.html", context)
 
@@ -116,12 +119,12 @@ def get_educational_details_page(
 ):
     context = {"request": request, "user": user}
     
-    sql: str = "select * from beneficiary_educational_details where id = %(user_id)s;"
+    sql: str = "select 1 from beneficiary_educational_details where id = %(user_id)s;"
     previous_record = execute_sql_select_statement(sql, {'user_id': user.id}, fetch_all = False)
 
     if previous_record:
-        context.update({"filled": True})
-        templates.TemplateResponse("educational_details.html", context)
+        context.update({"message": "Already provided your educational details"})
+        return templates.TemplateResponse("message.html", context)
 
     course_list = get_course_list()
     context.update({"course": course_list})
@@ -129,19 +132,19 @@ def get_educational_details_page(
     return templates.TemplateResponse("educational_details.html", context)
 
 
-@router.get("/bank_details")
-def get_bank_details_page(
-    request: Request,
-    user: schemas.TokenData = Depends(get_current_beneficiary)
-):
-    sql: str = """select 1 from beneficiary_bank_details where id = %(beneficiary_id)s;"""
+# @router.get("/bank_details")
+# def get_bank_details_page(
+#     request: Request,
+#     user: schemas.TokenData = Depends(get_current_beneficiary)
+# ):
+#     sql: str = """select 1 from beneficiary_bank_details where id = %(beneficiary_id)s;"""
     
-    previous_record = execute_sql_select_statement(sql, {"beneficiary_id": user.id})
+#     previous_record = execute_sql_select_statement(sql, {"beneficiary_id": user.id})
 
-    if previous_record:
-        return templates.TemplateResponse("message.html", {"request": request, "user": user, "message_type": "Error", "message": "Already Filled Bank Details."})
+#     if previous_record:
+#         return templates.TemplateResponse("message.html", {"request": request, "user": user, "message_type": "Error", "message": "Already Filled Bank Details."})
 
-    return templates.TemplateResponse("bank_details.html", {"request": request, "user": user})
+#     return templates.TemplateResponse("bank_details.html", {"request": request, "user": user})
 
 
 
@@ -194,45 +197,63 @@ def get_financial_assistance_application_page(
     profile_status: bool = Depends(get_profile_status)
 ):
     application_period_data = get_application_period_data(user.id)
-    context: dict = {"request": request, "user": user, "application_period": application_period_data, "message": None}
+    context: dict = {"request": request, "user": user, "message_type": "Info", "application_period": application_period_data}
 
     if not profile_status:
         context.update({"message": "Your profile is not verified yet. Please wait for approval by the admin or contact them for assistance."})
+        return templates.TemplateResponse("message.html", context)
     
     return templates.TemplateResponse("application_form.html", context)
-
-
-
-@router.get("/application_success")
-def get_success_page(
-    request: Request,    
-    user: schemas.TokenData = Depends(get_current_beneficiary)
-):
-    context: dict = {"request": request, "user": user}
-    return templates.TemplateResponse("success_application.html", context)
-
+        
     
 
 
 
 @router.post("/personal_details") 
 async def create_personal_details(
-    request: Request, response: Response,
+    request: Request,
     user: schemas.TokenData = Depends(get_current_beneficiary),
     personal_details: schemas.BeneficiaryPersonalInfo = Form()    
 ):
+    
+    context: dict = {"request": request, "user": user}
 
-    context: dict =  personal_details.model_dump() 
-    context.update({"request": request})
-    # Check the aadhar number. to identify duplicate record.
-    aadhar_check_sql: str = "select * from beneficiary_personal_details where aadhar_num = %(aadhar_num)s; "
-    previous_record = execute_sql_select_statement(
-        aadhar_check_sql, vars = {'aadhar_num': personal_details.aadhar_num}, fetch_all = False
-    )
+    previous_record_check_sql: str = """
+        select 
+            (select 
+                1
+            from 
+                beneficiary_personal_details
+            where
+                id = %(id)s
+            ) as personal_data_exist,
 
-    if previous_record:
-        context.update({"error_message": "Aadhar number alreadys exists!"})
+            (select 
+                1
+            from 
+                beneficiary_personal_details
+            where 
+                aadhar_num = %(aadhar_num)s
+            ) as aadhar_exists
+
+    """
+    vars = {"aadhar_num": personal_details.aadhar_num, "id": user.id}
+    previous_record = execute_sql_select_statement(previous_record_check_sql, vars, fetch_all = False)
+
+    print(previous_record)
+
+    # If aadhar number already exist in table return error message in the same personal detail form.
+    if previous_record["aadhar_exists"]:
+        context.update({"personal_details": personal_details.model_dump()})
+        context.update({"error_message": "Aadhar already exist."})
+        print(context)
         return templates.TemplateResponse("personal_details.html", context)
+    
+    # If the user already entered personal data return the error message.
+    if previous_record["personal_data_exist"]:
+        context.update({"message": "You already provided your personal details."})
+        return templates.TemplateResponse("message.html", context)
+
 
     full_name: str = personal_details.name.strip().replace(' ', '').title() + " " + personal_details.initial.strip().replace(' ', '').upper()
 
@@ -258,30 +279,48 @@ async def create_personal_details(
                     %(gheru_naav)s, %(aadhar_num)s, %(date_of_birth)s, %(phone_num)s, 
                     %(passport_size_pic)s
                 )
-                returning *
                 ;     
             """
     new_personal_details: None = execute_sql_commands(sql, processed_data) 
 
 
-    return RedirectResponse('/parental_details', status.HTTP_302_FOUND)  
+    return RedirectResponse('/beneficiary/parental_details', status.HTTP_302_FOUND)  
 
     
 @router.post("/parental_details")
 async def create_parental_details(
-    request: Request, response: Response,
+    request: Request,
     user: schemas.TokenData = Depends(get_current_beneficiary),
     parental_details: schemas.BeneficiaryParentalInfo = Form()
 ):
 
-    parent_details = parental_details.model_dump(exclude = {'family_pic'})
+    # Check for the existance of previous record.
+    previous_record_check_sql: str = "select 1 from beneficiary_parental_details where id = %(id)s;"
+    previous_record = execute_sql_select_statement(previous_record_check_sql, {"id": user.id}, fetch_all = False)
+
+    if previous_record:
+        return templates.TemplateResponse(
+            "message.html", {
+                "request": request,
+                "user": user,
+                "message": "Already provided your parental details", 
+                "message_type": "Info"
+            }
+        )
+        
+    parent_details = parental_details.model_dump(exclude = {"family_pic", "mother_name", "father_name"})
+    
     # Standardize the data.
     processed_data: dict = utils.get_processed_data(parent_details)
-
     # Read the family_pic
-    family_pic_content = await parental_details.family_pic.read()
+    family_pic_content = await parental_details.family_pic.read() if parental_details.family_pic.size != 0 else None
+    print(family_pic_content)
 
-    processed_data.update({'id': user.id, 'family_pic': family_pic_content})
+    processed_data.update({
+        "id": user.id, "family_pic": family_pic_content, 
+        "father_name": parental_details.father_name.upper(),
+        "mother_name": parental_details.mother_name.upper()
+    })
 
     sql: str = """
             insert into 
@@ -290,24 +329,36 @@ async def create_parental_details(
                 %(id)s, %(father_name)s, %(mother_name)s, %(father_occupation)s, %(mother_occupation)s,
                 %(parent_phone_num)s, %(address_line)s, %(city)s, %(district)s, %(pincode)s, %(family_pic)s
             )
-            returning *
             ;
     """
     new_parent_details: None = execute_sql_commands(sql, processed_data)
 
-    return RedirectResponse("/educational_details", status.HTTP_302_FOUND)
+    return RedirectResponse("/beneficiary/educational_details", status.HTTP_302_FOUND)
 
 
     
     
 @router.post("/educational_details")
 async def create_educational_details(
-    request: Request, response: Response,
+    request: Request,
     user: schemas.TokenData = Depends(get_current_beneficiary),
     educational_details: schemas.BeneficiaryEducationalInfo = Form()
 ):
+    
+    previous_record_check_sql: str = """select 1 from beneficiary_educational_details where id = %(id)s"""
+    previous_record = execute_sql_select_statement(previous_record_check_sql, {"id": user.id}, fetch_all = False)
+    
+    if previous_record:
+        return templates.TemplateResponse(
+            "message.html", {
+                "request": request,
+                "user": user,
+                "message": "Already provided your educational details",
+                "message_type": "Info"
+            }
+        )
 
-    data = educational_details.model_dump(exclude = {"tenth_marksheet", "eleventh_marksheet", "twelveth_marksheet", "degree"})
+    data = educational_details.model_dump(exclude = {"tenth_marksheet", "eleventh_marksheet", "twelveth_marksheet", "degree", "college_name"})
     data = utils.get_processed_data(data)
 
     course_id = course_df[
@@ -327,6 +378,7 @@ async def create_educational_details(
         "tenth_marksheet": tenth_marksheet_content,
         "eleventh_marksheet": eleventh_marksheet_content,
         "twelveth_marksheet": twelveth_marksheet_content,
+        "college_name": educational_details.college_name.upper(),
         "id": user.id
     })
     
@@ -342,22 +394,23 @@ async def create_educational_details(
                 %(college_type)s, %(university)s, %(college_address)s, %(tenth_marksheet)s, 
                 %(eleventh_marksheet)s, %(twelveth_marksheet)s
        )
-       returning id;
     """
 
     new_data: None = execute_sql_commands(sql, data)
 
-    return RedirectResponse("/financial_assistance_application", status_code = status.HTTP_302_FOUND)
+    return RedirectResponse("/beneficiary/financial_assistance_application", status_code = status.HTTP_302_FOUND)
+
+
 
 @router.post("/financial_assistance_application")
 async def create_financial_assistance_form(
-    request: Request, response: Response,
+    request: Request,
     user: schemas.TokenData = Depends(get_current_beneficiary),
     application_form: schemas.FinancialAssistanceApplication = Form()
 ):
     application_period_data = get_application_period_data(user.id)
-
-    # Computed again to avoid duplicate submission of data from malicious user.
+    context: dict = {"request": request, "user": user}
+    # Computed again to avoid duplicate submission of data from malicious user or accident submission by refresh.
     if application_period_data["previous_application"]:
         return templates.TemplateResponse("application_form.html", {"request": request, "user": user, "application_period": application_period_data})
 
@@ -404,46 +457,46 @@ async def create_financial_assistance_form(
     """    
 
     new_application: None = execute_sql_commands(sql, data)
+    context.update({"message": "Application Received", "message_type": "Success"})
+    return templates.TemplateResponse("message.html", context)
 
-    return RedirectResponse("/application_success", status_code = status.HTTP_302_FOUND)
 
+# @router.post("/bank_details")
+# async def create_bank_details(RedirectResponse("/application_success", status_code = status.HTTP_302_FOUND)
+#     request: Request,
+#     user: schemas.TokenData = Depends(get_current_beneficiary),
+#     bank_details: schemas.BeneficiaryBankInfo = Form()
+# ):
+#     # Check the beneficiary already filled the bank details.
 
-@router.post("/bank_details")
-async def create_bank_details(
-    request: Request,
-    user: schemas.TokenData = Depends(get_current_beneficiary),
-    bank_details: schemas.BeneficiaryBankInfo = Form()
-):
-    # Check the beneficiary already filled the bank details.
+#     sql: str = """select 1 from beneficiary_bank_details where id = %(beneficiary_id)s;"""
 
-    sql: str = """select 1 from beneficiary_bank_details where id = %(beneficiary_id)s;"""
+#     previous_record = execute_sql_select_statement(
+#         sql, {"beneficiary_id": user.id}, 
+#         fetch_all = False
+#     )
 
-    previous_record = execute_sql_select_statement(
-        sql, {"beneficiary_id": user.id}, 
-        fetch_all = False
-    )
+#     if previous_record:
+#         return templates.TemplateResponse("message.html", {"request": request, "user": user, "message_type": "Error", "message": "Already Filled Bank Details."})
 
-    if previous_record:
-        return templates.TemplateResponse("message.html", {"request": request, "user": user, "message_type": "Error", "message": "Already Filled Bank Details."})
-
-    sql: str = """
-        insert into beneficiary_bank_details(
-            id, account_holder_name, account_number, ifsc_code,bank_name, 
-            branch, bank_address, phone_number, upi_id, passbook
-        )
-        values (
-            %(id)s, %(account_holder_name)s, %(account_number)s, %(ifsc_code)s, %(bank_name)s, 
-            %(branch)s, %(bank_address)s, %(phone_number)s, %(upi_id)s, %(passbook)s
-        );
-    """
-    # Read the passbook.
-    passbook_content: bytes = await bank_details.passbook.read()
+#     sql: str = """
+#         insert into beneficiary_bank_details(
+#             id, account_holder_name, account_number, ifsc_code,bank_name, 
+#             branch, bank_address, phone_number, upi_id, passbook
+#         )
+#         values (
+#             %(id)s, %(account_holder_name)s, %(account_number)s, %(ifsc_code)s, %(bank_name)s, 
+#             %(branch)s, %(bank_address)s, %(phone_number)s, %(upi_id)s, %(passbook)s
+#         );
+#     """
+#     # Read the passbook.
+#     passbook_content: bytes = await bank_details.passbook.read()
     
-    vars = bank_details.model_dump(exclude = {"passbook"})
-    print(vars)
-    vars.update({"id": user.id, "passbook": passbook_content})
+#     vars = bank_details.model_dump(exclude = {"passbook"})
+#     print(vars)
+#     vars.update({"id": user.id, "passbook": passbook_content})
 
-    new_bank_details = execute_sql_commands(sql, vars)
+#     new_bank_details = execute_sql_commands(sql, vars)
 
-    return RedirectResponse("/financial_assistance_application", status_code = status.HTTP_302_FOUND)
+#     return RedirectResponse("/financial_assistance_application", status_code = status.HTTP_302_FOUND)
 

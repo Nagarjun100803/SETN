@@ -1,20 +1,38 @@
 from fastapi.templating import Jinja2Templates
-from typing import Literal
-from psycopg2.extras import RealDictRow
-from database import execute_sql_select_statement
+from pydantic_settings import BaseSettings
 
 templates = Jinja2Templates(directory = './templates')
 
 
 
-def get_user(by: Literal['email_id', 'id'], value: str | int) -> RealDictRow | None :
+
+class Settings(BaseSettings):
+    """
+        Base settings and configuration of all the credentials that are used across the app.
+    """
+    db_name: str
+    db_host: str
+    db_port: int 
+    db_user: str
+    db_password: str
+
+    base_url: str
+
+
+    password_reset_token_serializer_key: str
+
+    jwt_token_algorithm: str
+    jwt_token_expire_minutes: int
+    jwt_token_secret_key: str
     
-    email_sql: str = "select * from users where email_id = %(email_id)s;"
-    id_sql: str = "select * from users where id = %(id)s"
+    
+    email_server_port: int
+    sender_email_id: str
+    sender_email_password: str
 
-    if by == 'email_id':
-        beneficiary = execute_sql_select_statement(email_sql, vars ={'email_id': value}, fetch_all = False)
-    else:
-        beneficiary = execute_sql_select_statement(id_sql, vars = {'id': value}, fetch_all = False)
 
-    return beneficiary
+    class Config:
+        env_file = ".env"
+
+settings = Settings()
+
