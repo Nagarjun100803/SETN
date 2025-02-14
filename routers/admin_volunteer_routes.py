@@ -176,7 +176,7 @@ def get_application_uploads(
         return {"Message": "This applicant haven't uploaded this data."}
         
  
-    filename = f'{data['full_name'].strip().lower().replace(' ', '_')}_{beneficiary_id}_sem_{current_semester}_{document}.pdf'
+    filename = f"""{data.get("full_name").strip().lower().replace(' ', '_')}_{beneficiary_id}_sem_{current_semester}_{document}.pdf"""
     
     return Response(
         upload, media_type = "application/pdf",
