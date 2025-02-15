@@ -4,23 +4,18 @@
 
 {% block content %}
 
-    <div class="min-h-screen flex flex-col justify-center items-center mt-20">
-        {% if filled %}
-        <div>
-            <p>Already filled your Education details</p>
-        </div>
-        {% else %}
+    <div class="min-h-screen flex flex-col justify-center items-center mt-20 m-5">
  
-        <div id="full-form" class="bg-slate-50 rounded-lg shadow-lg shadow-gray-900 lg:w-1/2 lg:rounded-2xl">
+        <div id="full-form" class="p-5 bg-slate-50 rounded-lg shadow-lg shadow-gray-900 lg:w-1/2 lg:rounded-2xl">
             
-            <div id="form" class="flex flex-col gap-2 p-10">
+            <div id="form" class="flex flex-col gap-2">
                 <div id="heading-div">
                     <!-- <h1 class="text-xl text-indigo-500 font-bold italic text-center sm:text-xl lg:text-2xl">Educational Details</h1> -->
                     <h1 class="text-xl text-gray-900 font-bold text-center sm:text-xl lg:text-2xl">Educational Details</h1>
                     
                 </div>
                 
-                <form method="post" enctype="multipart/form-data" class="grid grid-cols-1 mt-2 gap-2 p-4 sm:grid sm:grid-cols-2 sm:gap-3">
+                <form method="post" enctype="multipart/form-data" class="grid grid-cols-1 mt-2 gap-2 sm:grid sm:grid-cols-2 sm:gap-3">
 
                     <div class="flex flex-col gap-0.5" id="tenth_perc-div">
                         <label for="tenth_perc">Tenth Percentage</label>
@@ -91,17 +86,17 @@
 
                     <div class="flex flex-col gap-2" id="tenth_marksheet-div">
                         <label for="tenth_marksheet">Tenth Marksheet</label>
-                        <input required type="file" name="tenth_marksheet" id="tenth_marksheet" accept=".pdf" class="">
+                        <input required type="file" name="tenth_marksheet" id="tenth_marksheet" accept="application/pdf" class="">
                     </div>
 
                     <div class="flex flex-col gap-2" id="eleventh_marksheet-div">
-                        <label for="eleventh_marksheet">Eleventh Marksheet <span class="text-sm">(optional)</span></label>
-                        <input type="file" name="eleventh_marksheet" id="eleventh_marksheet" accept=".pdf" class="">
+                        <label for="eleventh_marksheet">Eleventh Marksheet <small class="">(optional)</small></label>
+                        <input type="file" name="eleventh_marksheet" id="eleventh_marksheet" accept="application/pdf" class="">
                     </div>
 
                     <div class="flex flex-col gap-2 mt-2" id="tenth_marksheet-div">
                         <label for="twelveth_marksheet">Twelveth Marksheet</label>
-                        <input required type="file" name="twelveth_marksheet" id="twelveth_marksheet" accept=".pdf" class="">
+                        <input required type="file" name="twelveth_marksheet" id="twelveth_marksheet" accept="application/pdf" class="">
                     </div>
                     
                     <div class="flex flex-col mt-3 text-center">
@@ -175,5 +170,4 @@
           }
         });
       </script>
-      {% endif %}
 {% endblock %}

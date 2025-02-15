@@ -164,7 +164,7 @@ def get_application_uploads(
             beneficiary_id = %(beneficiary_id)s and current_semester = %(current_semester)s 
         ; 
     """
-    vars: dict = {'beneficiary_id': beneficiary_id, "current_semester": current_semester}
+    vars: dict = {"beneficiary_id": beneficiary_id, "current_semester": current_semester}
 
     data = execute_sql_select_statement(sql, vars, fetch_all = False)
 
@@ -271,11 +271,16 @@ def make_profile_verified(
         "remarks": remarks_form.remarks,
         "verifier_id": user.id
     }
+
+    conn = db.getconn()
+    cur = conn.cursor()
+
     # Check the beneficiary handler(admin or volunteer), if beneficiary id found in beneficiary assignment table,
     # The benficiary assigned to volunteer, else the benenficiary is handling by admin.
-    sql: str = """
+    verification_check_sql: str = """
         select 
             per.id,
+            per.remarks as old_remarks,
             per.is_verified,
             per.verified_by,
             ba.volunteer_id as is_assigned, -- Here volunteer id used as flag to know whether the beneficiary is handled by admin or hand over to volunteer.
@@ -291,7 +296,9 @@ def make_profile_verified(
             per.id = %(beneficiary_id)s
     """
     
-    beneficiary_record = execute_sql_select_statement(sql, vars, fetch_all = False)
+    # beneficiary_record = execute_sql_select_statement(sql, vars, fetch_all = False)
+    cur.execute(verification_check_sql, vars)
+    beneficiary_record = cur.fetchone()
 
     if not beneficiary_record:
         context.update({"message": "Something Went Wrong!", "message_type": "Error"})
@@ -311,18 +318,19 @@ def make_profile_verified(
                 where 
                     id = %(beneficiary_id)s
         """
-        remarks_update: None = execute_sql_commands(sql, vars)
+        remarks_update: None = cur.execute(remarks_update_sql, vars)
+        cur.close()
+        db.putconn(conn)
         context.update({"message": "Beneficiary remarks updated successfully", "message_type": "Success"})
         return templates.TemplateResponse("message.html", context)
     
 
     # Create verification data(Fresh verification) and also update that in beneficiary assignment.
     # Get a connection
-    conn: connection = db.getconn()
-    cur: cursor = conn.cursor()
 
     # Update the personal details table.
     try:
+        print("Enter into verification condition")
         sql: str = """
         update 
             beneficiary_personal_details

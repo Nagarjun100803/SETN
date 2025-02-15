@@ -398,7 +398,13 @@ async def create_educational_details(
 
     new_data: None = execute_sql_commands(sql, data)
 
-    return RedirectResponse("/beneficiary/financial_assistance_application", status_code = status.HTTP_302_FOUND)
+    context: dict = {
+        "message": "Your profile setup done.", 
+        "message_type": "Profile Complete",
+        "request": request, 
+        "user": user
+    } 
+    return templates.TemplateResponse("message.html", context)
 
 
 
@@ -457,7 +463,7 @@ async def create_financial_assistance_form(
     """    
 
     new_application: None = execute_sql_commands(sql, data)
-    context.update({"message": "Application Received", "message_type": "Success"})
+    context.update({"message": "Application submitted sucessfully.", "message_type": "Success"})
     return templates.TemplateResponse("message.html", context)
 
 

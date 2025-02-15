@@ -10,10 +10,19 @@ connection_params: dict[str, Any] = {
     "database": settings.db_name,
     "password": settings.db_password,
     "user": settings.db_user, 
-    'cursor_factory': RealDictCursor,
+    "cursor_factory": RealDictCursor,
     "host": settings.db_host,
     "port": settings.db_port 
 }
+
+connection_params_: dict[str, Any] = {
+    "database": "souglobal",
+    "password": "arju@123",
+    "user": "postgres", 
+    "cursor_factory": RealDictCursor,
+    "host": "localhost",
+    "port": 5432 
+} 
 
 # Create a database pool to create and store the connections.
 db: SimpleConnectionPool = SimpleConnectionPool(
