@@ -510,11 +510,11 @@ def get_all_applications(
     
     else: 
         filter_mapper: dict = {
-            "semester": " and (f.current_semester = %(semester)s)::int",
+            "semester": " and (f.current_semester = %(semester)s::int)",
             "location": " and (par.district = %(location)s)",
             "college_name": " and (edu.college_name = %(college_name)s)",
             "beneficiary_status": " and (f.beneficiary_status = %(beneficiary_status)s)", 
-            "application_status": " and (f.is_verified = %(application_status)s)::boolean"
+            "application_status": " and (f.is_verified = %(application_status)s)"
         }
         for filter_option, filter_option_value in filter_params.model_dump(exclude={"name", "email_id", "course", "application_handler"}).items():
             if (filter_option_value is not None) and (filter_option_value != "") and (filter_option_value != 0):

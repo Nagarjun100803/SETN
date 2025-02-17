@@ -4,19 +4,21 @@
 
 {% block content %}
 
-    <div class="min-h-screen flex flex-col justify-center items-center mt-20 m-5">
+    <div class="min-h-screen flex flex-col justify-center items-center mt-20 mx-5 my-auto mb-10">
  
-        <div id="full-form" class="p-5 bg-slate-50 rounded-lg shadow-lg shadow-gray-900 lg:w-1/2 lg:rounded-2xl">
+        <div id="full-form" class="p-7 bg-slate-50 rounded-md shadow-lg shadow-gray-900 lg:w-1/2 lg:rounded-2xl">
             
             <div id="form" class="flex flex-col gap-2">
                 <div id="heading-div">
                     <!-- <h1 class="text-xl text-indigo-500 font-bold italic text-center sm:text-xl lg:text-2xl">Educational Details</h1> -->
-                    <h1 class="text-xl text-gray-900 font-bold text-center sm:text-xl lg:text-2xl">Educational Details</h1>
+                    <h1 class="text-lg text-indigo-500 italic text-center sm:text-xl lg:text-2xl">Educational Details</h1>
                     
                 </div>
                 
-                <form method="post" enctype="multipart/form-data" class="grid grid-cols-1 mt-2 gap-2 sm:grid sm:grid-cols-2 sm:gap-3">
-
+                <h1 class="text-red-600 text-center"><span class="mr-2 font-bold underline mt-3">Note:</span> Make sure to fill the details as by marksheets.</h1>
+                
+                <form method="post" id="educational_detail_form" enctype="multipart/form-data" class="grid grid-cols-1 p-3 mt-2 gap-2 sm:grid sm:grid-cols-2 sm:gap-3">
+                    
                     <div class="flex flex-col gap-0.5" id="tenth_perc-div">
                         <label for="tenth_perc">Tenth Percentage</label>
                         <input required type="number" name="tenth_perc" min="50" max="100" step="0.01" oninput="validateRange(this)" placeholder="76.90" id="tenth_perc" pattern="" 
@@ -86,22 +88,22 @@
 
                     <div class="flex flex-col gap-2" id="tenth_marksheet-div">
                         <label for="tenth_marksheet">Tenth Marksheet</label>
-                        <input required type="file" name="tenth_marksheet" id="tenth_marksheet" accept="application/pdf" class="">
+                        <input required type="file" name="tenth_marksheet" id="tenth_marksheet" accept="" class="">
+                        <small class="text-red-500 hidden" id="tenth_marksheet_error_msg"></small>
                     </div>
 
                     <div class="flex flex-col gap-2" id="eleventh_marksheet-div">
                         <label for="eleventh_marksheet">Eleventh Marksheet <small class="">(optional)</small></label>
-                        <input type="file" name="eleventh_marksheet" id="eleventh_marksheet" accept="application/pdf" class="">
+                        <input type="file" name="eleventh_marksheet" id="eleventh_marksheet" accept="" class="">
+                        <small class="text-red-500 hidden" id="eleventh_marksheet_error_msg"></small>
                     </div>
 
                     <div class="flex flex-col gap-2 mt-2" id="tenth_marksheet-div">
                         <label for="twelveth_marksheet">Twelveth Marksheet</label>
-                        <input required type="file" name="twelveth_marksheet" id="twelveth_marksheet" accept="application/pdf" class="">
+                        <input required type="file" name="twelveth_marksheet" id="twelveth_marksheet" accept="" class="">
+                        <small class="text-red-500 hidden" id="twelveth_marksheet_error_msg"></small>
                     </div>
                     
-                    <div class="flex flex-col mt-3 text-center">
-                        <span class="text-red-600"><span class="text-lg font-bold underline">Note:</span> Make sure to fill the details as by marksheets.</span>
-                    </div>
 
                     <div class="flex flex-col mt-3 sm:mt-4 sm:col-span-2">
                         <button class=" bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg px-14 py-3" type="submit">Submit</button>
@@ -121,7 +123,16 @@
         const courseDropdown = document.getElementById("course");
         const degreeDropdown = document.getElementById("degree");
         const departmentDropdown = document.getElementById("department");
-    
+
+        const educationDetailaForm = document.getElementById("educational_detail_form");
+        const tenthMarksheet = document.getElementById("tenth_marksheet")
+        const eleventhMarksheet = document.getElementById("eleventh_marksheet") 
+        const twelvethMarksheet = document.getElementById("twelveth_marksheet")
+
+        const tenthMarksheetErrorField = document.getElementById("tenth_marksheet_error_msg");
+        const eleventhMarksheetErrorField = document.getElementById("eleventh_marksheet_error_msg");
+        const twelvethMarksheetErrorField = document.getElementById("twelveth_marksheet_error_msg");
+
         // Populate the course dropdown on page load
         document.addEventListener("DOMContentLoaded", () => {
           Object.keys(courseData).forEach(course => {
@@ -169,5 +180,51 @@
             });
           }
         });
+
+            // Prevent form submission from "" values 
+            educationDetailaForm.addEventListener("submit", (event) => {
+                if(courseDropdown.value === ""){
+                    event.preventDefault();
+                    courseDropdown.focus();
+                }
+                else if(degreeDropdown.value === ""){
+                    event.preventDefault();
+                    degreeDropdown.focus();
+                }
+                else if(departmentDropdown.value === ""){
+                    event.preventDefault();
+                    departmentDropdown.focus();
+                }
+            });
+
+            function checkFileInput(fileInputField, errorField) {
+                fileInputField.addEventListener("change", (event) => {
+                    const fileInput = event.target;
+                    const file = fileInput.files[0];
+
+                    if (file) {
+                        if (file.type !== "application/pdf") {
+                            errorField.textContent = "Only PDF files are allowed.";
+                            errorField.classList.remove("hidden"); // Show error message
+                            fileInput.value = ""; // Clear file input
+                        } 
+                        else if (file.size > 2 * 1024 * 1024) { // Check if file exceeds 2MB
+                            errorField.textContent = "File size must not exceed 2MB.";
+                            errorField.classList.remove("hidden"); // Show error message
+                            fileInput.value = ""; // Clear file input
+                        } 
+                        else {
+                            errorField.textContent = ""; // Clear any previous error message
+                            errorField.classList.add("hidden"); // Hide error message
+                        }
+                    }
+                });
+            }
+
+            // Attach event listeners to all file inputs
+            checkFileInput(document.getElementById("tenth_marksheet"), document.getElementById("tenth_marksheet_error_msg"));
+            checkFileInput(document.getElementById("eleventh_marksheet"), document.getElementById("eleventh_marksheet_error_msg"));
+            checkFileInput(document.getElementById("twelveth_marksheet"), document.getElementById("twelveth_marksheet_error_msg"));
+
       </script>
 {% endblock %}

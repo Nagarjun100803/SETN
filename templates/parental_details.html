@@ -6,12 +6,12 @@
 
     <div class="min-h-screen flex flex-col justify-center items-center mt-20">
         
-        <div id="full-form" class="p-4 bg-slate-50 rounded-lg shadow-lg shadow-gray-900 lg:w-1/2 mx-auto my-auto mb-10">
+        <div id="full-form" class="p-5 bg-slate-50 rounded-lg shadow-lg shadow-gray-900 lg:w-1/2  mx-5 my-auto mb-10">
             
             <div id="form" class="flex flex-col gap-2">
                 <div id="heading-div">
                     <!-- <h1 class="text-xl text-indigo-500 font-bold italic text-center sm:text-xl lg:text-2xl">Parental Details</h1> -->
-                    <h1 class="text-xl text-gray-900 font-bold  text-center sm:text-xl lg:text-2xl">Parental Details</h1>
+                    <h1 class="text-lg text-indigo-600 italic mt-2  text-center sm:text-xl lg:text-2xl">Parent Details</h1>
                     
                 </div> 
                 
@@ -65,8 +65,9 @@
                     </div>
     
                     <div class="flex flex-col gap-2" id="family_pic-div">
-                        <label for="family_pic">Family Photo <small class="text-sm">(optional)</small></label>
-                        <input type="file" name="family_pic" id="family_pic" accept="image/*">
+                        <label for="family_pic">Family Photo <small class="">(optional)</small></label>
+                        <input type="file" name="family_pic" id="family_pic" accept="image/jpeg">
+                        <small class="text-red-500 hidden" id="family_pic_error_msg">Only JPEG File format is accepted.</small>
                     </div>
                     <div class="flex flex-col mt-3 sm:mt-4 sm:col-span-2">
                         <button class=" bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg px-14 py-3" type="submit">Submit</button>
@@ -87,6 +88,9 @@
                 const pincodeErrorField = document.getElementById("pincode_error_msg");
                 const phoneNumberRegEx = /^[6-9]\d{9}$/;
                 const pincodeRegEx = /\d{6}$/;
+
+                const familyPic = document.getElementById("family_pic");
+
 
 
                 // Phone Number Validator
@@ -125,6 +129,23 @@
                         pincode.focus();
                     }
                 });
+
+                familyPic.addEventListener("change", (event) => {
+                    const fileInput = event.target;
+                    const file = fileInput.files[0];
+                    const errorMsgField = document.getElementById("family_pic_error_msg");
+
+                    if(file){
+                        if(file.type != 'image/jpeg'){
+                            errorMsgField.classList.remove("hidden");
+                            fileInput.value = '';
+                        }
+                        else{
+                            errorMsgField.classList.add("hidden");
+                        }
+                    }
+                });
+
                 
 
             });

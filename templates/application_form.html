@@ -24,7 +24,7 @@
             
             <div id="form" class="flex flex-col gap-2">
                 <div id="heading-div">
-                    <h1 class="text-xl text-gray-900 font-bold text-center sm:text-xl lg:text-2xl">Application Form</h1>
+                    <h1 class="text-xl text-indigo-500 italic mt-2 text-center sm:text-xl lg:text-2xl">Application Form</h1>
                 </div>
 
                 <!-- {% if error_message %}
@@ -33,7 +33,7 @@
                 </div>
                 {% endif %} -->
 
-                <form method="post" enctype="multipart/form-data" class="grid grid-cols-1 mt-2 gap-2 sm:grid sm:grid-cols-2  sm:gap-4 sm:space-x-2 sm:items-center">
+                <form method="post" enctype="multipart/form-data" class="p-4 grid grid-cols-1 mt-2 gap-2 sm:grid sm:grid-cols-2  sm:gap-4 sm:space-x-2 sm:items-center">
                     <input type="hidden" name="application_period_id" id="application_period_id" value="{{application_period.id}}">
 
                     <div class="flex flex-col gap-0.5" id="beneficiary_status-div">
@@ -125,8 +125,8 @@
                         </div>
                     </div>
 
-                    <div class="flex flex-col gap-0.5 sm:col-span-2" id="reason_for_expecting_financial_assistance-div">
-                        <label for="reason_for_expecting_financial_assistance">Describe your situation</label>
+                    <div class="mt-2 flex flex-col gap-0.5 sm:col-span-2" id="reason_for_expecting_financial_assistance-div">
+                        <label for="reason_for_expecting_financial_assistance">Why do you need this scholarship</label>
                         <textarea name="reason_for_expecting_financial_assistance" id="reason_for_expecting_financial_assistance" 
                             class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md"></textarea>
                     </div>

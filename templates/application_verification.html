@@ -5,54 +5,58 @@
 {% block content %}
 
 {% macro create_application_details(title, application_details, beneficiary_id) %}
-<div class="relative col-span-1 p-4 bg-slate-100 rounded-lg shadow">
+<div class="relative col-span-1 p-6 bg-slate-100 rounded-lg shadow border-2 border-gray-400 border-dashed hover:border-gray-500 hover:shadow-xl">
 
-      <h2 class="text-lg font-bold text-amber-400 text-center italic underline mb-4">{{title}}</h2>
-      <p><span class="font-semibold">Parental Status:</span> {{ application_details.parental_status }}</p>
-      <p><span class="font-semibold">Annual Family Income:</span> {{ application_details.total_annual_family_income }}</p>
-      <p><span class="font-semibold">House Status:</span> {{ application_details.house_status }}</p>
-      <p><span class="font-semibold">Reason for Assistance:</span> {{ application_details.reason_for_expecting_financial_assistance }}</p>
-      <p><span class="font-semibold">Special Considerations:</span> {{ application_details.special_consideration }}</p>
-      <p><span class="font-semibold">Failed Subjects:</span> {{ 'No' if not application_details.have_failed_in_any_subject_in_last_2_sem else 'Yes' }}</p>
-      <p><span class="font-semibold">Latest Semester Percentage:</span> {{ application_details.latest_sem_perc }}</p>
-      <p><span class="font-semibold">Previous Semester Percentage:</span> {{ application_details.previous_sem_perc }}</p>
-      <p><span class="font-semibold">Difference in Percentage :</span> {{ application_details.difference_in_sem_perc }}</p>
-  
+      <h1 class="text-base sm:text-lg italic text-center  mb-4">{{title}}</h1>
+      <h2 class="text-base sm:text-lg text-emerald-700 text-center italic underline mb-1 sm:mb-2">Application Details</h2>
+      <p>Parental Status: <span class="font-bold">{{ application_details.parental_status }}</span></p>
+      <p>Annual Family Income: <span class="font-bold">{{ application_details.total_annual_family_income }}</span></p>
+      <p>House Status: <span class="font-bold">{{ application_details.house_status }}</span></p>
+      <p>Failed Subjects: <span class="font-bold">{{ 'No' if not application_details.have_failed_in_any_subject_in_last_2_sem else 'Yes' }}</span></p>
+      <p>Latest Semester Percentage: <span class="font-bold">{{ application_details.latest_sem_perc }}</span></p>
+      <p>Previous Semester Percentage: <span class="font-bold">{{ application_details.previous_sem_perc }}</span></p>
+      <p>Difference in Percentage: <span class="font-bold">{{ application_details.difference_in_sem_perc }}</span></p>
+      <p>Reason for Assistance: <span class="font-bold">{{ application_details.reason_for_expecting_financial_assistance }}</span></p>
+      <p>Special Considerations: <span class="font-bold">{{ application_details.special_consideration }}</span></p>
+     
 
       <div class="mt-4 flex flex-col">
-          <p><span class="font-semibold">Academic Year: </span> {{ application_details.academic_year }}</p>
-          <p><span class="font-semibold">Semester:</span> {{ application_details.semester }}</p>
-          <p><span class="font-semibold">Applied at:</span> {{ application_details.applied_at.date() }}</p>
+          <h2 class="text-base sm:text-lg text-emerald-700 text-center italic underline mb-1 sm:mb-2">Application Period Details</h2>
+          <p>Academic Year: <span class="font-semibold">{{ application_details.academic_year }}</span> </p>
+          <p>Semester: <span class="font-semibold">{{ application_details.semester }}</span> </p>
+          <p>Applied at: <span class="font-semibold">{{ application_details.applied_at.strftime('%d/%m/%Y @ %I:%M%p')}}</span></p>
       </div>
 
       {% if application_details.application_status %} 
         <div class="mt-4 flex-flex-col items-center">
-          <h1 class="font-bold text-green-700 underline">Verification Details</h1>
-          <p><span class="font-semibold">Verified By: </span>{{application_details.verifier_name}}</p>
-          <p><span class="font-semibold">Verified: </span>{{application_details.verified_at.date()}} @ {{application_details.verified_at.strftime('%I:%M %p')}}</p>
-          <p><span class="font-semibold">Conclusion: </span>
+
+          <h2 class="text-base sm:text-lg text-emerald-700 text-center italic underline mb-1 sm:mb-2">Verification Details</h2>
+          <p>Verified By: <span class="font-bold">{{application_details.verifier_name}}</span></p>
+          <p>Verified: <span class="font-bold">{{application_details.verified_at.strftime('%d/%m/%Y @ %I:%M%p')}}</span></p>
+          <p>Conclusion: <span class="font-bold">
             {{'Rejected' if application_details.reason_for_rejection else 'Accepted'}}
+          </span>
           </p>
           {% if application_details.reason_for_rejection %}
-              <p><span class="font-semibold">Reason for rejection: {{application_details.reason_for_rejection}} </span>
+              <p>Reason for rejection: <span class="font-bold">{{application_details.reason_for_rejection}} </span>
           {% endif %}
         </div>
       {% endif %}
 
       {% if application_details.amount %}
         <div class="mt-4 flex flex-col">
-          <h1 class="font-bold text-green-700 underline">Sponsor Details</h1>
-          <p><span class="font-semibold">Transferred Amount: </span> {{ application_details.amount }}</p>
-          <p><span class="font-semibold">Sponsor:</span> {{ application_details.sponsor_name }}</p>
-          <p><span class="font-semibold">Sponsor Number:</span> {{ application_details.sponsor_num }}</p>
-          <p><span class="font-semibold">Location:</span> {{ application_details.sponsor_location }}</p>
-          <p><span class="font-semibold">Country:</span> {{ application_details.sponsor_country }}</p>
-          <p><span class="font-semibold">Transferred on:</span> {{ application_details.transaction_date}}</p>
+          <h2 class="text-base sm:text-lg text-emerald-700 italic text-center underline mb-1 sm:mb-2">Sponsor Details</h2>
+          <p>Transfered Amount: <span class="font-bold">{{ application_details.amount }}</span> </p>
+          <p>Sponsor: <span class="font-bold">{{ application_details.sponsor_name }}</span> </p>
+          <p>Sponsor Number: <span class="font-bold">{{ application_details.sponsor_num }}</span> </p>
+          <p>Location: <span class="font-bold">{{ application_details.sponsor_location }}</span> </p>
+          <p>Country: <span class="font-bold">{{ application_details.sponsor_country }}</span> </p>
+          <p>Transfered on: <span class="font-bold">{{ application_details.transaction_date.strftime('%d/%m/%Y')}}</span></p>
         </div>
       {% endif %}
 
 
-      <div class="mt-2 flex flex-col gap-1 items-end underline">
+      <div class="lg:absolute left-0 right-0 bottom-2 mr-2  mt-2 flex flex-col gap-1 items-end underline">
         <a target="_blank" href="/admin_and_volunteer/application/uploads?beneficiary_id={{ beneficiary_id }}&current_semester={{ application_details.current_semester}}&document=latest_sem_marksheet" class="text-gray-950 py-1 hover:text-indigo-600">Latest Sem Marksheet</a>
         <a target="_blank" href="/admin_and_volunteer/application/uploads?beneficiary_id={{ beneficiary_id }}&current_semester={{ application_details.current_semester}}&document=previous_sem_marksheet" class="text-gray-950 py-1 hover:text-indigo-600">Previous Sem Marksheet</a>
         <a target="_blank" href="/admin_and_volunteer/application/uploads?beneficiary_id={{ beneficiary_id }}&current_semester={{ application_details.current_semester}}&document=bonafide_or_fee_paid_proof" class="text-gray-950 py-1 hover:text-indigo-600">Bonafide</a>
@@ -63,9 +67,9 @@
 {% endmacro %}
 
 
-<div class="m-5 mt-20 p-6 bg-slate-50 rounded-lg shadow-lg">
+<div class="m-5 mt-20 p-6 bg-slate-50 rounded-lg shadow-lg border-2">
     <!-- Header Section -->
-    <div class="flex flex-col items-center">
+    <div class="flex flex-col items-center p-4 rounded-lg">
       <div class="relative w-40 h-40 lg:w-52 lg:h-52 mb-3">
         <img
           src="/admin_and_volunteer/beneficiary_profile_pic/{{ data.general_details.beneficiary_id }}"
@@ -73,7 +77,7 @@
           class="w-[150px] h-[150px] lg:w-[200px] lg:h-[200px]  rounded-full shadow-lg border-2 border-white hover:shadow-2xl transition-all"
         />
       </div>
-      <h1 class="text-lg sm:text-xl font-bold text-emerald-500">{{ data.general_details.full_name }}</h1>
+      <h1 class="text-base lg:text-2xl font-bold text-emerald-700">{{ data.general_details.full_name }}</h1>
       <p class="text-md lg:text-lg text-center">{{ data.general_details.degree }} - {{ data.general_details.course }}</p>
       <p class="text-md lg:text-lg text-center text-gray-950">{{ data.general_details.department }}</p>
       <p class="text-md lg:text-lg text-center text-red-600">{{ data.general_details.college_name }}</p>
@@ -93,7 +97,7 @@
     
     {% if data.current_application_details.application_status %}
         <div class="mt-5">
-            <h1 class="text-xl sm:text-2xl xl:text-3xl font-serif text-amber-600 text-center">Application Verified</h1>
+            <h1 class="text-xl sm:text-2xl xl:text-3xl text-emerald-600 text-center">Application Verified</h1>
         </div>
     {% else %}
     
