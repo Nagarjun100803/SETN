@@ -26,7 +26,7 @@ connection_params_: dict[str, Any] = {
 
 # Create a database pool to create and store the connections.
 db: SimpleConnectionPool = SimpleConnectionPool(
-    minconn = 4, maxconn = 12, **connection_params 
+    minconn = 4, maxconn = 12, **connection_params
 )
 
 
@@ -126,10 +126,12 @@ def initate_database_tables():
         create table if not exists sponsors(
             id serial primary key,
             full_name varchar(300) not null, 
-            phone_num varchar(12) not null,
+            phone_num varchar(12) not null unique,
+            email_id varchar(100) unique,
             location varchar not null,
             country varchar not null,
-            average_contribution numeric not null
+            average_contribution numeric not null,
+            created_at timestamp not null default now()
         ); 
 
         create table if not exists users(
@@ -144,7 +146,7 @@ def initate_database_tables():
         create table if not exists beneficiary_personal_details(
             id integer references users(id) not null, 
             full_name varchar not null, 
-            name_as_in_passbook varchar not null, 
+            --name_as_in_passbook varchar not null, 
             gender varchar(20) not null, 
             gheru_naav varchar(30) not null, 
             aadhar_num varchar(12) not null, 
@@ -236,6 +238,8 @@ def initate_database_tables():
             is_verified boolean default false,
             verified_by integer references users(id),
             verified_at timestamp,
+            remarks varchar not null,
+            conclusion varchar(10) not null,
             
             unique(beneficiary_id, application_period_id)
         );
@@ -259,7 +263,7 @@ def initate_database_tables():
             --unique(beneficiary_id, volunteer_id)
         );
 
-        create table if not exists admin_volunteer(
+        create table if not exists admin_volunteers(
             id integer references users(id),
             full_name varchar(100) not null,
             phone_num varchar(10) not null,

@@ -15,8 +15,16 @@
                     
                 </div>
                 
-                <h1 class="text-red-600 text-center"><span class="mr-2 font-bold underline mt-3">Note:</span> Make sure to fill the details as by marksheets.</h1>
-                
+                <div class="text-red-600 p-3 sm:p-4 font-bold">
+                    <h1 class="text-red-600 text-center text-sm sm:text-lg underline">Note:</h1>
+                    <ol class="text-red-600 flex flex-col gap-1 list-decimal list-inside">
+                        <li>Make sure to fill the details carefully.</li>
+                        <li>Enter all the marks as mentioned in the marksheets</li>
+                        <li>Choose the appropriate course, Do not continue to register, If your course is not found in the list. Contact admin</li>
+                        <li>Upload files in the PDF format.</li>
+                    </ol>
+                </div>
+
                 <form method="post" id="educational_detail_form" enctype="multipart/form-data" class="grid grid-cols-1 p-3 mt-2 gap-2 sm:grid sm:grid-cols-2 sm:gap-3">
                     
                     <div class="flex flex-col gap-0.5" id="tenth_perc-div">
@@ -88,19 +96,19 @@
 
                     <div class="flex flex-col gap-2" id="tenth_marksheet-div">
                         <label for="tenth_marksheet">Tenth Marksheet</label>
-                        <input required type="file" name="tenth_marksheet" id="tenth_marksheet" accept="" class="">
+                        <input required type="file" name="tenth_marksheet" id="tenth_marksheet" accept=".pdf" class="">
                         <small class="text-red-500 hidden" id="tenth_marksheet_error_msg"></small>
                     </div>
 
                     <div class="flex flex-col gap-2" id="eleventh_marksheet-div">
                         <label for="eleventh_marksheet">Eleventh Marksheet <small class="">(optional)</small></label>
-                        <input type="file" name="eleventh_marksheet" id="eleventh_marksheet" accept="" class="">
+                        <input type="file" name="eleventh_marksheet" id="eleventh_marksheet" accept=".pdf" class="">
                         <small class="text-red-500 hidden" id="eleventh_marksheet_error_msg"></small>
                     </div>
 
                     <div class="flex flex-col gap-2 mt-2" id="tenth_marksheet-div">
                         <label for="twelveth_marksheet">Twelveth Marksheet</label>
-                        <input required type="file" name="twelveth_marksheet" id="twelveth_marksheet" accept="" class="">
+                        <input required type="file" name="twelveth_marksheet" id="twelveth_marksheet" accept=".pdf" class="">
                         <small class="text-red-500 hidden" id="twelveth_marksheet_error_msg"></small>
                     </div>
                     

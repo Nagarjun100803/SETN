@@ -28,7 +28,6 @@
             <p class="">Phone: <span class="font-bold">{{ profile.phone_num }}</span> </p>
             <p class="">Gheru Naav: <span class="font-bold">{{ profile.gheru_naav }}</span> </p>
             <p class="">Date of Birth: <span class="font-bold">{{ profile.date_of_birth }}</span> </p>
-            <p class="">Gmail: <span class="font-bold">{{ profile.email_id }}</span></p>
             <p class="">Status: 
                   {% if profile.is_verified %}
                   <span class="text-emerald-600 font-bold">Verified</span>
@@ -37,6 +36,8 @@
                   {% endif %}
                 
             </p>
+            <p class="font-bold text-center underline mt-2 hover:text-indigo-600">{{ profile.email_id }}</p>
+
           
           </div>
       

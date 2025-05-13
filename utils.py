@@ -63,6 +63,7 @@ def get_compressed_image(
 def custom_data_type_conversion(obj):
     if isinstance(obj, Decimal):
         return float(obj)
+    return obj
 
 
 
@@ -79,17 +80,4 @@ def get_user(by: Literal['email_id', 'id'], value: str | int) -> RealDictRow | N
     return beneficiary
 
 if __name__ == '__main__':
-    course_df = pd.read_csv('./notebooks/final_course_list.csv')
-    sql: str = """
-        insert into courses(
-          course, degree, department, duration  
-        ) 
-        values
-        %s
-        ;
-    """
-    conn = db.getconn()
-    cur = conn.cursor()
-    execute_values(cur, sql, course_df.values)
-    conn.commit()
-    print('ok')
+    print("Hi")

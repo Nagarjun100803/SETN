@@ -4,11 +4,12 @@
 
 {% block content %}
 
-{% macro create_application_details(title, application_details, beneficiary_id) %}
-<div class="relative col-span-1 p-6 bg-slate-100 rounded-lg shadow border-2 border-gray-400 border-dashed hover:border-gray-500 hover:shadow-xl">
+{% macro create_application_details(title, application_details, general_details) %}
+<div class="relative col-span-1 p-6 bg-slate-100 rounded-lg shadow border-2 border-gray-400 border-dashed hover:border-gray-500 hover:shadow-xl ">
 
       <h1 class="text-base sm:text-lg italic text-center  mb-4">{{title}}</h1>
       <h2 class="text-base sm:text-lg text-emerald-700 text-center italic underline mb-1 sm:mb-2">Application Details</h2>
+      <p>Beneficiary Status: <span class="font-bold">{{ application_details.beneficiary_status }}</span></p>
       <p>Parental Status: <span class="font-bold">{{ application_details.parental_status }}</span></p>
       <p>Annual Family Income: <span class="font-bold">{{ application_details.total_annual_family_income }}</span></p>
       <p>House Status: <span class="font-bold">{{ application_details.house_status }}</span></p>
@@ -53,13 +54,16 @@
           <p>Country: <span class="font-bold">{{ application_details.sponsor_country }}</span> </p>
           <p>Transfered on: <span class="font-bold">{{ application_details.transaction_date.strftime('%d/%m/%Y')}}</span></p>
         </div>
+      
+      {% else %}
+        <a href="/admin/add_scholarship_amount?application_id={{application_details.id}}&beneficiary_name={{general_details.full_name}}" class="text-center"> Add Fund</a>
       {% endif %}
 
 
-      <div class="lg:absolute left-0 right-0 bottom-2 mr-2  mt-2 flex flex-col gap-1 items-end underline">
-        <a target="_blank" href="/admin_and_volunteer/application/uploads?beneficiary_id={{ beneficiary_id }}&current_semester={{ application_details.current_semester}}&document=latest_sem_marksheet" class="text-gray-950 py-1 hover:text-indigo-600">Latest Sem Marksheet</a>
-        <a target="_blank" href="/admin_and_volunteer/application/uploads?beneficiary_id={{ beneficiary_id }}&current_semester={{ application_details.current_semester}}&document=previous_sem_marksheet" class="text-gray-950 py-1 hover:text-indigo-600">Previous Sem Marksheet</a>
-        <a target="_blank" href="/admin_and_volunteer/application/uploads?beneficiary_id={{ beneficiary_id }}&current_semester={{ application_details.current_semester}}&document=bonafide_or_fee_paid_proof" class="text-gray-950 py-1 hover:text-indigo-600">Bonafide</a>
+      <div class=" left-0 right-0 bottom-2 mr-2  mt-2 flex flex-col gap-1 items-end underline">
+        <a target="_blank" href="/admin_and_volunteer/application/uploads?beneficiary_id={{ general_details.beneficiary_id }}&current_semester={{ application_details.current_semester}}&document=latest_sem_marksheet" class="text-gray-950 py-1 hover:text-indigo-600">Latest Sem Marksheet</a>
+        <a target="_blank" href="/admin_and_volunteer/application/uploads?beneficiary_id={{ general_details.beneficiary_id }}&current_semester={{ application_details.current_semester}}&document=previous_sem_marksheet" class="text-gray-950 py-1 hover:text-indigo-600">Previous Sem Marksheet</a>
+        <a target="_blank" href="/admin_and_volunteer/application/uploads?beneficiary_id={{ general_details.beneficiary_id }}&current_semester={{ application_details.current_semester}}&document=bonafide_or_fee_paid_proof" class="text-gray-950 py-1 hover:text-indigo-600">Bonafide</a>
       </div>
 
 
@@ -88,10 +92,10 @@
     <!-- // Application Sections -->
     <div class="grid grid-cols-1 {% if data.previous_application_details %} sm:grid-cols-2 {% endif %} gap-4 mt-10">
         {% if data.previous_application_details %}
-            {{create_application_details("Previous Application Details", data.previous_application_details, data.general_details.beneficiary_id)}}
-            {{create_application_details("Current Application Details", data.current_application_details, data.general_details.beneficiary_id)}}
+            {{create_application_details("Previous Application Details", data.previous_application_details, data.general_details)}}
+            {{create_application_details("Current Application Details", data.current_application_details, data.general_details)}}
         {% else %}
-            {{create_application_details("Current Application Details", data.current_application_details, data.general_details.beneficiary_id)}}
+            {{create_application_details("Current Application Details", data.current_application_details, data.general_details)}}
         {% endif %}
     </div>
     
@@ -101,40 +105,39 @@
         </div>
     {% else %}
     
-    <form method="post" id="remarks_form" name="remarks_form" class="mt-10">
-         <!-- Input Fields Section -->
-          <h2 class="text-lg font-bold text-gray-900">Remarks</h2>
-          <textarea name="remarks" 
-                    rows="3"
-                    id="remarks_field" 
-                    class="w-full p-3 mt-2 bg-gray-50 border rounded-lg shadow-sm" 
-                    placeholder="Enter remarks for this application"
-                    required
-                    >
-          </textarea>
-          <input type="number" value="{{data.current_application_details.application_period_id}}" name="application_period_id" id="application_period_id" class="hidden">
-          <input type="number" value="{{data.current_application_details.id}}" name="application_id" id="application_id" class="hidden">
-      </form>
 
-    <form method="post" name="reject_form" id="reject_form">
-      <h2 class="text-lg font-bold text-gray-900 mt-6">Reason for Rejection</h2>
-          <textarea name="reason_for_rejection" 
-                    id="rejection_reason"
-                    rows="2" 
-                    class="w-full p-3 mt-2 bg-gray-50 border rounded-lg shadow-sm" 
-                    placeholder="Provide a reason for rejection if applicable"></textarea>
-          <small id="rejection_reason_error_msg" class="text-red-600 hidden"></small>
-          <input type="number" value="{{data.current_application_details.application_period_id}}" name="application_period_id" id="application_period_id" class="hidden">
-          <input type="number" value="{{data.current_application_details.id}}" name="application_id" id="application_id" class="hidden">
+          <form action="" id="verification_form" method="post" class="mt-10 p-3 sm:p-20 border-2 border-indigo-500 rounded-lg">
+            <!-- <input type="number" value="{{data.current_application_details.application_period_id}}" name="application_period_id" id="application_period_id" class="hidden"> -->
+            <input type="number" value="{{data.current_application_details.id}}" name="application_id" id="application_id" class="hidden">
+            <!-- <input type="number" value="{{data.current_application_details.beneficiary_id}}" name="application_id" id="beneficiary_id" class="hidden"> -->
 
-      </form>
-     
+            <div class="flex flex-col gap-2 rounded-lg ">
+                  <div class="flex flex-col gap-1">
+                      <label for="remarks">Application Remarks</label>
+                      <textarea name="remarks" id="remarks" placeholder=""
+                              class="rounded-lg focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md"></textarea>
+                      <small id="remarks_error_msg" class="text-red-600 hidden"></small>
+                  </div>
+
+                  <div class="flex flex-col gap-1">
+                      <label for="reason for rejection">Reason For reject</label>
+                      <textarea  name="reason_for_rejection" id="reason_for_rejection" placeholder=""
+                              class="rounded-lg focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md"></textarea>
+                      <small id="rejection_reason_error_msg" class="text-red-600 hidden"></small>
+                  </div>
+
+                  <div class="flex justify-between gap-4 mt-2">
+                    <button type="submit" name="conclusion" value="reject" id="reject_button" class="px-6 py-2 text-white bg-red-500 rounded-lg hover:bg-red-600">Reject</button>
+                    <button type="submit" name="conclusion" value="accept" id="accept_button" class="px-6 py-2 text-white bg-emerald-500 rounded-lg hover:bg-emerald-600">Accept</button>
+                </div>
+
+            </div>
+
+        </form>
+      
 
       <!-- Action Buttons -->
-      <div class="flex justify-between gap-4 mt-6">
-          <button type="submit" form="reject_form" class="px-6 py-2 text-white bg-red-500 rounded-lg hover:bg-red-600">Reject</button>
-          <button type="submit" form="remarks_form" class="px-6 py-2 text-white bg-emerald-500 rounded-lg hover:bg-emerald-600">Accept</button>
-      </div>
+      
 
       {% endif %}
 
@@ -143,38 +146,60 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            const remarksField = document.getElementById("remarks_field");
-            const rejectionReasonField = document.getElementById("rejection_reason");
+            const remarksField = document.getElementById("remarks");
+            const rejectionReasonField = document.getElementById("reason_for_rejection");
             const rejectionErrorMsgField = document.getElementById("rejection_reason_error_msg");
+            const remarksErrorMsgField = document.getElementById("remarks_error_msg"); 
 
-            const remarsForm = document.getElementById("remarks_form");
-            const rejectForm = document.getElementById("reject_form");
+
+            const acceptButton = document.getElementById("accept_button");
+            const rejectButton = document.getElementById("reject_button");
+
+            const verificationForm = document.getElementById("verification_form");
 
             const previousRemarks = "{{ data.general_details.remarks }}";
             
-            if (previousRemarks){
-              remarksField.value = previousRemarks;
-            }
+          
+            verificationForm.addEventListener("submit", (event) => {
+                  const clickedButton = document.activeElement; // Return either accept button or reject button.
 
+                  if (clickedButton === acceptButton && remarksField.value.trim() === ""){
+                        remarksErrorMsgField.textContent = "Enter Remarks to accept the applications";
+                        remarksErrorMsgField.classList.remove("hidden");
+                        event.preventDefault();
+                        remarksField.focus();
+                  }
+                  else if(clickedButton === rejectButton && rejectionReasonField.value.trim() === ""){
+                        rejectionErrorMsgField.classList.remove("hidden");
+                        rejectionErrorMsgField.textContent = "Enter reason for rejection to reject the applications";
+                        event.preventDefault();
+                        rejectionReasonField.focus();
+                  }
+                  else if(clickedButton === acceptButton && rejectionReasonField.value.trim() !== ""){
+                     alert("You entered reason to reject, but you tries to accept the application!");
+                     event.preventDefault();
+                  }
+                  else if(remarksField.value.trim() === ""){
+                        remarksErrorMsgField.textContent = "Enter Remarks to proceed further.";
+                        remarksErrorMsgField.classList.remove("hidden");
+                        event.preventDefault();
+                        remarksField.focus();
 
-            remarsForm.addEventListener("submit", (event) => {
-                if (remarksField.value.trim() === ''){
-                    event.preventDefault();
-                    remarsForm.focus();
-                }
+                  }
             });
-            
-            rejectForm.addEventListener("submit", (event) => {
-                if (rejectionReasonField.value.trim() === ''){
-                  event.preventDefault();
-                  rejectionErrorMsgField.textContent = "Please add a reason for rejection";
-                  rejectionErrorMsgField.classList.remove("hidden");
-                  rejectionReasonField.focus();
+
+            remarksField.addEventListener("input", ()=> {
+                if(remarksField.value.trim() === ""){
+                    remarksErrorMsgField.textContent = "Enter a remarks field.";
+                    remarksErrorMsgField.classList.remove("hidden");
+                    remarksField.focus();
                 }
-            });
+                else{
+                    remarksErrorMsgField.textContent = "";
+                    remarksErrorMsgField.classList.add("hidden");
+                }
 
-
-
+            })
 
         });
 

@@ -1,8 +1,10 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, status
 from fastapi.staticfiles import StaticFiles
+from config import templates
+from fastapi.responses import RedirectResponse
 from routers import user_routes, beneficiary_routes, admin_routes, volunteer_routes, admin_volunteer_routes
 from database import execute_sql_commands, initate_database_tables, execute_sql_select_statement
-from contextlib import asynccontextmanager
+# from contextlib import asynccontextmanager
 
 
 
@@ -40,3 +42,7 @@ app.include_router(admin_volunteer_routes.router)
 @app.get('/test')
 def test_path():
     return "Shivaya Namah"
+
+@app.get("/")
+def root_page(request: Request):
+    return RedirectResponse(url="/index", status_code = status.HTTP_307_TEMPORARY_REDIRECT)

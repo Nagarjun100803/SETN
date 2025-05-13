@@ -1,5 +1,5 @@
 from typing import Literal
-from fastapi import APIRouter, Body, Form, Request, Response, status, Depends
+from fastapi import APIRouter, Body, Form, HTTPException, Query, Request, Response, status, Depends
 from database import execute_sql_select_statement, execute_sql_commands, execute_sql_commands_with_multiple_params
 import schemas
 from oauth2 import get_current_admin
@@ -13,51 +13,6 @@ router = APIRouter(
 )
 
 
-@router.get("/all_applications")
-def get_all_applications(
-    request: Request,
-    user: schemas.TokenData = Depends(get_current_admin)
-):
-    sql: str = """
-        select 
-            per.id as beneficiary_id,
-            per.full_name as name,
-            c.degree,
-            c.department,
-            c.course,
-            edu.college_name,
-            f.beneficiary_status,
-            f.parental_status,
-            f.total_annual_family_income,
-            f.house_status,
-            f.special_consideration,
-            f.reason_for_expecting_financial_assistance, 
-            f.special_consideration,
-            f.have_failed_in_any_subject_in_last_2_sem,
-            f.latest_sem_perc,
-            f.previous_sem_perc,
-            f.current_semester,
-            f.difference_in_sem_perc
-        from 
-            financial_assistance_applications as f
-        join 
-            beneficiary_personal_details as per
-        on 
-            f.beneficiary_id = per.id
-        join 
-            beneficiary_educational_details as edu
-        on 
-            f.beneficiary_id = edu.id
-        join 
-            courses as c
-        on
-            edu.course_id = c.id
-        ; 
-
-        """
-    applications = execute_sql_select_statement(sql)
-    # print(applications)
-    return templates.TemplateResponse("sample.html", {"request": request, "user": user, "applications": applications})
 
 
 @router.get("/beneficiaries")
@@ -273,3 +228,175 @@ def allocate_beneficiaries(
         "request": request, "user": user, "message_type": "Success",
         "message": "Beneficiaries assisgned successfully."
     })
+
+
+@router.get("/new_sponsor")
+def get_sponsor_create_page(
+    request: Request,
+    user: schemas.TokenData = Depends(get_current_admin)
+):
+    context: dict = {"request": request, "user": user}
+    
+    return templates.TemplateResponse("sponsor_create.html", context)
+
+
+@router.post("/new_sponsor")
+def create_new_sponsor(
+    request: Request,
+    sponsor: schemas.SponsorCreate = Form(),
+    user: schemas.TokenData = Depends(get_current_admin),
+):
+    
+    context: dict = {"request": request, "user": user}
+    
+    sql: str = """
+        select
+            exists(
+                select
+                    1
+                from 
+                    sponsors
+                where 
+                    email_id = %(email_id)s
+            ) as email_exist,
+
+            exists(
+                select 
+                    1
+                from 
+                    sponsors
+                where 
+                    phone_num = %(phone_num)s
+            ) as phone_num_exist,
+
+            exists(
+                select 
+                    1
+                from 
+                    sponsors
+                where 
+                    full_name = %(full_name)s
+            ) as full_name_exist
+    """
+    vars: dict = sponsor.model_dump()
+
+    previous_record_flag = execute_sql_select_statement(sql, vars, fetch_all = False)
+    
+    atleast_one_previous_record_flag = pd.Series(previous_record_flag).any() # return True if any one value is True
+
+    if atleast_one_previous_record_flag:
+
+        if previous_record_flag.get("email_exist"):
+            context.update({"message": "Email Id already exist"})
+        
+        elif previous_record_flag.get("phone_num_exist"):
+            context.update({"message": "Contact Number already exist"}) 
+        
+        elif previous_record_flag.get("full_name_exist"):
+            context.update({"message": "Name already exist"})
+        
+        context.update({"sponsor": vars, "message_type": "Error"})
+        
+        return templates.TemplateResponse("sponsor_create.html",context)
+    
+    # Create a new sponsor.
+
+    create_sponsor_sql: str = """
+        insert into 
+            sponsors(
+                full_name, phone_num, email_id, location, country, average_contribution
+            )
+        values
+            (%(full_name)s, %(phone_num)s, %(email_id)s, %(location)s, %(country)s, %(average_contribution)s)
+        ;
+    """
+
+    new_sponsor: None = execute_sql_commands(create_sponsor_sql, vars)
+
+    context.update({"message": "Sponsor Created.", "message_type": "Success"})
+    return templates.TemplateResponse("sponsor_create.html", context)
+            
+
+@router.get("/add_scholarship_amount")
+def get_add_scholarship_amount_page(
+    request: Request,
+    user: schemas.TokenData = Depends(get_current_admin),
+    beneficiary_details: schemas.AddFundQuery = Query()
+):
+    context: dict = {"request": request, "user": user}
+
+    # Get all sponsor data that used to add fund to students.
+    sql: str = """
+        select
+            id,
+            full_name
+        from 
+            sponsors
+        ;
+    """
+    sponsors = execute_sql_select_statement(sql)
+
+    context.update({"sponsors": sponsors, "beneficiary_details": beneficiary_details.model_dump()})
+    # print(context)
+    
+    return templates.TemplateResponse("sample.html", context)
+
+    
+@router.post("/add_scholarship_amount")
+def create_scholarship_record(
+    request: Request,
+    scholarship_data: schemas.CreateScholarship = Form(),
+    user: schemas.TokenData = Depends(get_current_admin),
+):
+    
+    context: dict = {"request": request, "user": user}
+    # check for the previous fund transaction of same application to avoid redundancy.
+    previous_fund_sql: str = """
+            select 
+                case
+                    when (amount is not null) or (sponsor_id is not null) then true
+                    else false
+                end as previous_allocation
+            from 
+                approved_applications
+            where 
+                application_id = %(application_id)s 
+            ;
+    """
+    vars = {"application_id": scholarship_data.application_id}
+
+    previous_fund = execute_sql_select_statement(previous_fund_sql, vars, fetch_all = False)
+
+    if not previous_fund:
+        raise HTTPException(400, details = "Something went wrong.")        
+
+    if previous_fund["previous_allocation"]:
+        context.update({
+            "message": "Fund already allocated to this application",
+            "message_type": "Info"
+        })
+        return templates.TemplateResponse("message.html", context)
+    
+
+    # Create a new fund allocation record.
+    create_fund_sql: str = """
+            update
+                approved_applications
+            set 
+                amount = %(amount)s, 
+                sponsor_id = %(sponsor_id)s,
+                transfered_at = now()
+            where 
+                application_id = %(application_id)s
+            ;
+    """
+    vars = scholarship_data.model_dump()
+
+    new_fund = execute_sql_commands(create_fund_sql, vars)
+
+    context.update({
+        "message": "Fund allocated",
+        "message_type": "Info"
+    })
+
+    return templates.TemplateResponse("message.html", context)

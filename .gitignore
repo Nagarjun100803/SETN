@@ -183,3 +183,10 @@ data
 uploader.py
 bank_detail_uploader.html
 bank_routes.py
+query.py 
+app.py
+nav.html
+templates_/
+.vscode/
+.sql
+.session.sql

@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="/static/output.css">
 
 </head>
-<body class="font-serif text-xs sm:text-sm lg:text-base">
+<body class="text-xs sm:text-sm lg:text-base">
   <!-- Navbar -->
   <header class="bg-white shadow-md fixed w-full top-0 left-0 z-10">
     <div class="grid grid-cols-2 md:grid-cols-3 items-center gap-4 p-4">
@@ -25,13 +25,13 @@
         <a href="/beneficiary/financial_assistance_application" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700">Application</a>
         
         {% elif user and user.role == 'admin' %}
-        <a href="/admin_and_volunteer/applications" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700">Applications</a>
+        <a href="/admin_and_volunteer/get_application_periods" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700">Applications</a>
         <a href="/admin/beneficiaries" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700">Beneficiaries</a>
         <a href="/admin/assign_beneficiaries" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700 text-nowrap">Assign</a>
         <a href="#" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700 text-wrap">Dashboard</a>
         
         {% elif user and user.role == 'volunteer' %}
-        <a href="/admin_and_volunteer/applications" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700 text-nowrap">Applications</a>
+        <a href="/admin_and_volunteer/get_application_periods" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700 text-nowrap">Applications</a>
         <a href="/volunteer/beneficiaries" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700 text-nowrap">Beneficiaires</a>
         <a href="#" class="text-emerald-600 hover:text-indigo-700 active:text-emerald-700 text-nowrap">History</a>
         
@@ -75,12 +75,12 @@
             <a href="#" class="block text-emerald-600">History</a>
             <a href="/beneficiary/financial_assistance_application" class="block text-emerald-600">Application</a>
         {% elif user and user.role == 'admin' %}
-            <a href="/admin_and_volunteer/applications" class="block text-emerald-600">Applications</a>
+            <a href="/admin_and_volunteer/get_application_periods" class="block text-emerald-600">Applications</a>
             <a href="/admin/beneficiaries" class="block text-emerald-600">Beneficiaries</a>
             <a href="/admin/assign_beneficiaries" class="block text-emerald-600">Assign</a>
             <a href="#" class="block text-emerald-600">Dashboard</a> 
         {% elif user and user.role == 'volunteer' %}
-            <a href="/admin_and_volunteer/applications" class="block text-emerald-600">Applications</a>
+            <a href="/admin_and_volunteer/get_application_periods" class="block text-emerald-600">Applications</a>
             <a href="/volunteer/beneficiaries" class="block text-emerald-600">Beneficiaires</a>
             <!-- <a href="#" class="block text-emerald-600">History</a> -->
         {% else %}

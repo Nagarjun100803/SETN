@@ -185,7 +185,7 @@ def get_application_period_data(beneficiary_id: int):
     ) 
 
     # This is the formar of data {'id': 4, 'academic_year': '2024-2025', 'semester': 'even', 'start_date': datetime.date(2024, 12, 30), 'end_date': datetime.date(2025, 1, 30), 'opened_at': datetime.datetime(2024, 12, 31, 11, 50, 21, 763865), 'status': True, 'previous_application': True}
-    # print(application_period_data)
+    print(application_period_data)
     return application_period_data
     
 
@@ -197,6 +197,7 @@ def get_financial_assistance_application_page(
     profile_status: bool = Depends(get_profile_status)
 ):
     application_period_data = get_application_period_data(user.id)
+    print(application_period_data)
     context: dict = {"request": request, "user": user, "message_type": "Info", "application_period": application_period_data}
 
     if not profile_status:
@@ -270,12 +271,12 @@ async def create_personal_details(
 
     sql: str = """
                 insert into beneficiary_personal_details(
-                    id, full_name, name_as_in_passbook, gender, 
+                    id, full_name,  gender, 
                     gheru_naav, aadhar_num, date_of_birth, phone_num, 
                     passport_size_pic
                 )
                 values(
-                    %(id)s, %(full_name)s, %(name_as_in_passbook)s, %(gender)s, 
+                    %(id)s, %(full_name)s,  %(gender)s, 
                     %(gheru_naav)s, %(aadhar_num)s, %(date_of_birth)s, %(phone_num)s, 
                     %(passport_size_pic)s
                 )
@@ -420,6 +421,32 @@ async def create_financial_assistance_form(
     if application_period_data["previous_application"]:
         return templates.TemplateResponse("application_form.html", {"request": request, "user": user, "application_period": application_period_data})
 
+    # Compute the beneiciary status. 'New, Applied, Availed.'
+    beneficiary_status_sql: str = """
+        select 
+            f.beneficiary_id, 
+            sum(ap.amount) as previous_fund
+        from 
+            financial_assistance_applications as f
+        left join 
+            approved_applications as ap 
+        on 
+            f.id = ap.application_id
+        where 
+            f.beneficiary_id = %(beneficiary_id)s
+        group by 
+            f.beneficiary_id
+    """
+    status = execute_sql_select_statement(beneficiary_status_sql, {"beneficiary_id": user.id}, fetch_all = False)
+
+    beneficiary_status: str = str()
+    if not status:
+        beneficiary_status = "New"
+    elif status["previous_fund"]:
+        beneficiary_status = "Availed"
+    elif status["beneficiary_id"]:
+        beneficiary_status = "Applied"
+    
     data = application_form.model_dump(exclude = {'latest_sem_marksheet', 'previous_sem_marksheet', 'bonafide_or_fee_paid_proof', 'special_consideration'})
 
     # Calculate the difference in Semester percentage.
@@ -441,7 +468,8 @@ async def create_financial_assistance_form(
         "latest_sem_marksheet": latest_sem_marksheet_content,
         "previous_sem_marksheet": previous_sem_marksheet_content,
         "bonafide_or_fee_paid_proof": bonafide_fee_paid_proof_content,
-        "difference_in_sem_perc": difference_in_sem_perc
+        "difference_in_sem_perc": difference_in_sem_perc,
+        "beneficiary_status": beneficiary_status
 
     })
     sql: str = """
@@ -465,7 +493,6 @@ async def create_financial_assistance_form(
     new_application: None = execute_sql_commands(sql, data)
     context.update({"message": "Application submitted sucessfully.", "message_type": "Success"})
     return templates.TemplateResponse("message.html", context)
-
 
 # @router.post("/bank_details")
 # async def create_bank_details(RedirectResponse("/application_success", status_code = status.HTTP_302_FOUND)

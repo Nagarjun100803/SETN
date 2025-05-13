@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block title %}Sponsor{% endblock %}
+
+{% block content %}
+
+<div class="min-h-screen flex flex-col justify-center items-center m-5 mt-20 mb-20">
+  <div id="full-form" class="bg-slate-50 rounded-lg shadow-lg shadow-gray-900 md:w-1/2">
+      
+      <div id="form" class="flex flex-col gap-2 p-10">
+          <div id="heading-div" class="text-center">
+              <h1 class="text-lg lg:text-xl text-indigo-600 italic mb-2">Sponsor</h1>
+              <span class="">Create New Sponsor</span>    
+          </div>
+
+          <!-- Message Section -->
+          {% if message_type == 'Error' %}
+              <div id="error-div" class="text-center text-lg lg:text-xl mt-3 text-red-600 italic ">
+                  <p>{{message}}</p>
+              </div>
+          {% else %}
+            <div id="error-div" class="text-center text-lg lg:text-xl mt-3 text-green-600 italic ">
+                <p>{{message}}</p>
+            </div>
+          {% endif %}
+          <form method="post" id="sponsor_create_form" class="grid grid-cols-1 gap-2 mt-3">
+              <div class="flex flex-col gap-0.5" id="full_name-div">
+                  <label for="full_name">Sponsor Name</label>
+                  <input required autofocus type="text" name="full_name" id="full_name" placeholder="Raman"
+                      class="rounded-lg focus:ring-1 focus:ring-indigo-400  focus:shadow-gray-900 focus:shadow-md"
+                      value = "">
+              </div>
+              
+              <div class="flex flex-col gap-0.5" id="phone_num-div">
+                  <label for="phone_num">Contact Number</label>
+                  <input required type="text" name="phone_num" id="phone_num" maxlength="12" placeholder="989889543232"
+                      class="rounded-lg focus:ring-1 focus:ring-indigo-400  focus:shadow-gray-900 focus:shadow-md"
+                      value = "">
+              </div>
+
+              <div class="flex flex-col gap-0.5" id="email_id-div">
+                <label for="email_id">Email Id<small> (Optional)</small></label>
+                <input type="email" name="email_id" id="email_id" placeholder="raman1@gmail.com"
+                    class="rounded-lg focus:ring-1 focus:ring-indigo-400  focus:shadow-gray-900 focus:shadow-md"
+                    value = "">
+              </div>
+
+              
+              <div class="flex flex-col gap-0.5" id="location-div">
+                <label for="location">Location</label>
+                <input required type="text" name="location" id="location" placeholder="Madurai"
+                    class="rounded-lg focus:ring-1 focus:ring-indigo-400  focus:shadow-gray-900 focus:shadow-md"
+                    value = "">
+              </div>
+              
+              <div class="flex flex-col gap-0.5" id="country-div">
+                <label for="country">Country</label>
+                <select name="country" id="country" class="rounded-lg focus:ring-1 focus:ring-indigo-400  focus:shadow-gray-900 focus:shadow-md">
+                    <option value="">Select Country</option>
+                </select>
+                <small class="text-red-600 hidden" id="country_error_msg"></small>
+              </div>
+                
+              <div class="flex flex-col gap-0.5" id="average_contribution-div">
+                <label for="average_contribution">Average Contribution</label>
+                <input required type="number" min="500" name="average_contribution" id="average_contribution" placeholder="5000"
+                    class="rounded-lg focus:ring-1 focus:ring-indigo-400  focus:shadow-gray-900 focus:shadow-md"
+                    value = "">
+              </div>
+
+              <div class="flex flex-col mt-3">
+                  <button class=" bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg px-14 py-3" type="submit">Create Sponsor</button>
+              </div>
+              
+          </form>
+  </div>
+  </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+
+        const sponsorCreateForm = document.getElementById("sponsor_create_form");
+        const nameField = document.getElementById("full_name");
+        const phoneNumField = document.getElementById("phone_num");
+        const emailIdField = document.getElementById("email_id");
+        const locationField = document.getElementById("location");
+        const countryField = document.getElementById("country");
+        const averageContributionField = document.getElementById("average_contribution");
+        
+        const countryErrorMsgField = document.getElementById("country_error_msg");
+
+        // Create options for country.
+        const countries = [
+            "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria", 
+            "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", 
+            "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia", 
+            "Cameroon", "Canada", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo (Congo-Brazzaville)", 
+            "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czechia (Czech Republic)", "Democratic Republic of the Congo", "Denmark", "Djibouti", 
+            "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini (Swaziland)", 
+            "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", 
+            "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", 
+            "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", 
+            "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Madagascar", "Malawi", "Malaysia", "Maldives", 
+            "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", 
+            "Morocco", "Mozambique", "Myanmar (Burma)", "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", 
+            "North Korea", "North Macedonia", "Norway", "Oman", "Pakistan", "Palau", "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", 
+            "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", 
+            "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", 
+            "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", 
+            "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", 
+            "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", 
+            "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"
+        ];
+
+        
+        countries.forEach(country => {
+            const option = document.createElement("option");
+            option.value = country;
+            option.textContent = country;
+            countryField.appendChild(option);
+
+        });
+
+
+
+
+        // Jinja Injected values 
+        const sponsorDataString = '{{ sponsor | tojson | safe  if sponsor else "null"}}';
+        
+        const sponsor_data = JSON.parse(sponsorDataString);
+        console.log("Injected Sponsor Data:", sponsor_data);
+        if(sponsor_data){
+            nameField.value = sponsor_data.full_name;
+            phoneNumField.value = sponsor_data.phone_num;
+            emailIdField.value = sponsor_data.email_id;
+            locationField.value = sponsor_data.location;
+            countryField.value = sponsor_data.country;
+            averageContributionField.value = sponsor_data.average_contribution;        
+        }
+    
+
+        sponsorCreateForm.addEventListener("submit", (event) => {
+            if(countryField.value.trim() === ""){
+                event.preventDefault();
+                countryErrorMsgField.textContent = "Please select a country";
+                countryErrorMsgField.classList.remove("hidden");
+                countryField.focus();
+
+            }
+
+        });
+
+        countryField.addEventListener("input", () => {
+            if(countryField.value.trim() === ""){
+                countryErrorMsgField.textContent = "Please select a country";
+                countryErrorMsgField.classList.remove("hidden");
+                countryField.focus();
+
+            }
+            else{
+                countryErrorMsgField.classList.add("hidden");
+                countryErrorMsgField.textContent = "";
+                
+            }
+        });
+
+    });
+
+    
+</script>
+
+{% endblock %}

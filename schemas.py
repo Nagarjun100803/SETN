@@ -21,7 +21,6 @@ class BeneficiaryPersonalInfo(BaseModel):
 
     initial: str
     name: str 
-    name_as_in_passbook: str 
     gender: Literal['Male', 'Female']
     gheru_naav: str
     aadhar_num: constr(min_length = 12, max_length = 12) 
@@ -85,7 +84,7 @@ class ApplicationPeriod(BaseModel):
 class FinancialAssistanceApplication(BaseModel):
 
     application_period_id:int
-    beneficiary_status: str
+    # beneficiary_status: str
     parental_status: str
     total_annual_family_income: str
     house_status: str
@@ -118,6 +117,8 @@ class RemarksSchema(BaseModel):
 
 
 class ApplicationFilterParams(BaseModel):
+
+    application_period_id: int
     email_id: str = ""
     name: str = ""
     beneficiary_status: str = ""
@@ -128,10 +129,47 @@ class ApplicationFilterParams(BaseModel):
     application_status: bool | str = False
     application_handler: Literal["admin", "volunteer", ""] = ""
 
+    limit_size: int = 1
+    offset_size: int = 1
+
 
 class BeneficiaryFilterParams(BaseModel):
 
     name: str = ""
     email_id: str = ""
-    beneficiary_status: str | Literal["verified", "new"] = ""
+    beneficiary_status: str | Literal["verified", "new", "all"] = "all"
     college_name: str = ""
+
+
+class SponsorCreate(BaseModel):
+
+    full_name: str 
+    phone_num: constr(min_length = 10, max_length = 13) # type:ignore
+    email_id: EmailStr | str = "" 
+    location: str 
+    country: str
+    average_contribution: int
+
+
+class AddFundQuery(BaseModel):
+    
+    application_id: int
+    beneficiary_name: str
+    previous_sponsor: str = ""
+
+
+class CreateScholarship(BaseModel):
+
+    application_id: int 
+    sponsor_id: int 
+    amount: float
+    transferred_at: date
+    
+
+
+class ApplicationVerification(BaseModel):
+    
+    application_id: int
+    remarks: str
+    reason_for_rejection: str | None = None
+    conclusion: Literal["accept", "reject"]

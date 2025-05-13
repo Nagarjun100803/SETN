@@ -33,16 +33,28 @@
                 </div>
                 {% endif %} -->
 
+                <div class="text-red-600 px-3 sm:px-4 font-bold font-serif">
+                    <h1 class=" text-center text-sm sm:text-lg underline">Note:</h1>
+                    <ol class=" flex flex-col gap-1 list-decimal list-inside px-4">
+                        <li>Make sure to fill the details carefully.</li>
+                        <li>Enter all the marks as mentioned in the marksheets.</li>
+                        <li>If you are first year student and not received any semester marksheets then Enter 12th percentage in Latest Sem Percentage field and Enter 11th percentage in Previous Sem Percentage field.</li>
+                        <li>If you are first year student and not received any semester marksheets then upload 12th marksheet in Latest Sem Marksheet field and upload 11th marksheet in Previous Sem marksheet field.</li>
+                        <li>Upload Bonafide or Fee paid receipt, if you not received any semester marksheets.</li>
+                        <li>Upload all files in the PDF format.</li>
+                    </ol>
+                </div>
+
                 <form method="post" enctype="multipart/form-data" class="p-4 grid grid-cols-1 mt-2 gap-2 sm:grid sm:grid-cols-2  sm:gap-4 sm:space-x-2 sm:items-center">
                     <input type="hidden" name="application_period_id" id="application_period_id" value="{{application_period.id}}">
 
-                    <div class="flex flex-col gap-0.5" id="beneficiary_status-div">
+                    <!-- <div class="flex flex-col gap-0.5" id="beneficiary_status-div">
                         <label for="beneficiary_status">Beneficiary Status</label>
                         <select name="beneficiary_status" id="beneficiary_status" class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md">
                             <option value="Availed">Received Before</option>
                             <option value="New">Not Received Before</option>
                         </select>
-                    </div>
+                    </div> -->
                     
                     <div class="flex flex-col gap-0.5" id="parental_status">
                         <label for="parental_status" >Parental Status</label>
@@ -126,7 +138,7 @@
                     </div>
 
                     <div class="mt-2 flex flex-col gap-0.5 sm:col-span-2" id="reason_for_expecting_financial_assistance-div">
-                        <label for="reason_for_expecting_financial_assistance">Why do you need this scholarship</label>
+                        <label for="reason_for_expecting_financial_assistance">Explain your current situation</label>
                         <textarea name="reason_for_expecting_financial_assistance" id="reason_for_expecting_financial_assistance" 
                             class="rounded-lg  focus:ring-1 focus:ring-indigo-600  focus:shadow-gray-900 focus:shadow-md"></textarea>
                     </div>
@@ -134,30 +146,30 @@
                     
                     <div class="flex flex-col gap-2" id="lateset_sem_marksheet-div">
                         <label for="lateset_sem_marksheet">Latest Sem Marksheet</label>
-                        <input required type="file" name="latest_sem_marksheet" id="latest_sem_marksheet" accept="" class="">
+                        <input required type="file" name="latest_sem_marksheet" id="latest_sem_marksheet" accept="application/pdf" class="">
                         <small class="text-red-500 hidden" id="ls_error_msg"></small>
                     </div>
                     
                     <div class="flex flex-col gap-2 mt-2" id="previous_sem_marksheet-div">
                         <label for="previous_sem_marksheet">Previous Sem Marksheet</label>
-                        <input required type="file" name="previous_sem_marksheet" id="previous_sem_marksheet" accept="" class="">
+                        <input required type="file" name="previous_sem_marksheet" id="previous_sem_marksheet" accept="application/pdf" class="">
                         <small class="text-red-500 hidden" id="ps_error_msg"></small>
                     </div>
                     
-                    <div class="flex flex-col mt-3 text-center">
+                    <!-- <div class="flex flex-col mt-3 text-center">
                         <span class="text-red-600"><span class="text-lg font-bold underline pr-2">Note:</span>Upload bonafide or Fee paid receipt. If you not receive any semester marksheets!</span>
-                    </div>
+                    </div> -->
                     
                     <div class="flex flex-col gap-2" id="bonafide_or_fee_paid_receipt-div">
                         <label for="bonafide_or_fee_paid_receipt">Bonafife or Fee Paid Receipt <small class="">(optional)</small></label>
-                        <input type="file" name="bonafide_or_fee_paid_proof" id="bonafide_or_fee_paid_receipt" accept="" class="">
+                        <input type="file" name="bonafide_or_fee_paid_proof" id="bonafide_or_fee_paid_receipt" accept="application/pdf" class="">
                         <small class="text-red-500 hidden" id="bf_error_msg"></small>
                     </div>
                     
 
-                    <div class="flex flex-col mt-3 text-center sm:col-span-2">
+                    <!-- <div class="flex flex-col mt-3 text-center sm:col-span-2">
                         <span class="text-red-600"><span class="text-lg font-bold underline pr-2">Note:</span>Please make sure all the information is entered accurately. Any error will result in instant rejection!</span>
-                    </div>
+                    </div> -->
                     <div class="flex flex-col mt-3 sm:mt-4 sm:col-span-2">
                         <button class=" bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg px-14 py-3" type="submit">Submit</button>
                     </div>

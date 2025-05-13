@@ -372,8 +372,8 @@ def make_profile_verified(
 @router.get("/application_filters")
 def get_application_filters(
     request: Request,
-    user: schemas.TokenData = Depends(get_current_admin_or_volunteer),
-    application_period_id: int = Depends(get_latest_application_period)
+    application_period_id: int,
+    user: schemas.TokenData = Depends(get_current_admin_or_volunteer)
 ):
     sql: str = """
         select 
@@ -434,16 +434,56 @@ def get_application_filters(
     )
 
 
+@router.get("/get_application_periods")
+def get_applications_select_page(
+    request: Request,
+    user: schemas.TokenData = Depends(get_current_admin_or_volunteer),    
+):
+    
+    application_period_overview_sql: str = """
+        select 
+            x.*,
+            ap.academic_year,
+            upper(ap.semester) as semester
+        from(
+            select 
+                f.application_period_id,
+                sum(aap.amount)::int as total_amount_distribution,
+                count(f.id) as total_applications
+            from 
+                financial_assistance_applications as f
+            left join 
+                approved_applications as aap
+            on 
+                aap.application_id = f.id
+            group by 
+                f.application_period_id
+        )x 
+        join 
+            application_periods as ap 
+        on 
+            x.application_period_id = ap.id
+        order by 
+                x.application_period_id desc
+        ;
+    """
+
+    application_period_overiview = execute_sql_select_statement(application_period_overview_sql)
+
+    context: dict = {"user": user, "request": request, "application_periods": application_period_overiview}
+    
+    return templates.TemplateResponse("applications_overview.html", context)
+
 
 @router.get("/applications")
 def get_all_applications(
     request: Request,
+    # application_period_id: int ,
     filter_params: schemas.ApplicationFilterParams = Query(),
     user: schemas.TokenData = Depends(get_current_admin_or_volunteer),
-    latest_application_period_id: int = Depends(get_latest_application_period),
 ):
     """
-        Endpoint Provided the applications applied by the beneficiaries.
+        Endpoint provides the applications applied by the beneficiaries.
         Admin can see all the applications.
         Volunteer can only see the application assoscaited by their beneficiaires
     """
@@ -489,9 +529,9 @@ def get_all_applications(
         on 
             ba.beneficiary_id = f.beneficiary_id
         where 
-            (f.application_period_id = %(latest_application_period_id)s)
+            (f.application_period_id = %(application_period_id)s)
         """   
-    vars: dict = {"latest_application_period_id": latest_application_period_id} # Used to store the db parameters
+    vars: dict = {"application_period_id": filter_params.application_period_id} # Used to store the db parameters
     if user.role == "volunteer":
         # Add a where clause so that they can only see the particular results.
         sql += " and (ba.volunteer_id = %(user_id)s)"
@@ -516,7 +556,7 @@ def get_all_applications(
             "beneficiary_status": " and (f.beneficiary_status = %(beneficiary_status)s)", 
             "application_status": " and (f.is_verified = %(application_status)s)"
         }
-        for filter_option, filter_option_value in filter_params.model_dump(exclude={"name", "email_id", "course", "application_handler"}).items():
+        for filter_option, filter_option_value in filter_params.model_dump(exclude={"name", "email_id", "course", "application_handler", "application_period_id", "limit_size", "offset_size"}).items():
             if (filter_option_value is not None) and (filter_option_value != "") and (filter_option_value != 0):
                 sql += filter_mapper[filter_option]
                 vars.update({filter_option: filter_option_value})
@@ -529,19 +569,28 @@ def get_all_applications(
             vars.update({"degree": degree, "department": department})
     
     # Order the application in beneficiary_id 
-    sql += " order by f.beneficiary_id"
+    sql += """ 
+        order by 
+            f.is_verified
+        ;      
+    """
+    vars.update({"limit": filter_params.limit_size, "offset": filter_params.offset_size})
     
     # print(sql)
     # print()
     # print(vars)
 
     applications = execute_sql_select_statement(sql, vars)
+
+    context: dict = {"request": request, "user": user}
+
+    if not applications:
+        context.update({"message_type": "Error", "message": "Sorry No records to show."})
+        return templates.TemplateResponse("message.html", context)
     
-    return templates.TemplateResponse(
-        "applications.html", {
-            "request": request, "user": user, 
-            "applications": applications, "filter_params": filter_params.model_dump()
-        })
+    context.update({"applications": applications, "filter_params": filter_params.model_dump()})
+    
+    return templates.TemplateResponse("applications.html", context)
 
 
 
@@ -584,7 +633,7 @@ def get_application(
             s.location as sponsor_location,
             s.country as sponsor_country,
             ap.transfered_at::date as transaction_date
-
+      
         from(
             select 
                 f.id, f.beneficiary_id, per.full_name, c.degree, c.course, c.department, edu.college_name,  
@@ -656,6 +705,7 @@ def get_application(
     
     # print(general_details)
     data = {"general_details": general_details}
+
     
     data.update({"current_application_details": application_details.iloc[0].to_dict()})
     # Update previous sem details if exists else update as None
@@ -672,141 +722,210 @@ async def approve_or_reject_application(
     request: Request,
     beneficiary_id: int,
     user: schemas.TokenData = Depends(get_current_admin_or_volunteer),
-    application_period_id: int = Form(),
-    application_id: int = Form(),
-    remarks: str | None = Form(None),
-    reason_for_rejection: str | None = Form(None)
+    application_verification_schema: schemas.ApplicationVerification = Form()
 ):
     
     context: dict = {"request": request, "user": user}
     # Check if both are False.
-    if not any([remarks, reason_for_rejection]):
+    if not any([application_verification_schema.remarks, application_verification_schema.reason_for_rejection]):
         context.update({
             "message": "Require remarks or reason for rejection to proceed further.",
             "message_type": "Error"
         })
     
-    # Create a vars for db params that can be used for either accept or reject operation.
-    vars: dict = {
-        "reason_for_rejection": reason_for_rejection,
-        "beneficiary_id": beneficiary_id,
-        "application_period_id": application_period_id,
-        "verified_by": user.id, 
-        "remarks": remarks,
-        "application_id": application_id
-    }
-
-    if reason_for_rejection:
-        # Perform the rejection operation
-        sql: str = """
-            update 
-                financial_assistance_applications
-            set
-                is_verified = true,
-                reason_for_rejection = %(reason_for_rejection)s,
-                verified_by = %(verified_by)s,
-                verified_at = now()
-            where   
-                beneficiary_id = %(beneficiary_id)s and 
-                application_period_id = %(application_period_id)s
-            ; 
-        """
-        
-        result: None = execute_sql_commands(sql, vars)
-        
-        context.update({
-            "message": "Application Rejected", 
-            "message_type": "Info"
-        })
-        return templates.TemplateResponse("message.html", context)
-    
-    else:
-        # Perform the accept operaion.
-        update_application_status_sql: str = """
-            update 
-                financial_assistance_applications
-            set 
-                is_verified = true,
-                verified_by = %(verified_by)s,
-                verified_at = now()
-            where    
-                beneficiary_id = %(beneficiary_id)s and 
-                application_period_id = %(application_period_id)s
-        """   
-        
-        update_personal_details_sql: str = """
-            update 
-                beneficiary_personal_details
-            set 
-                remarks = %(remarks)s
-            where 
-                id = %(beneficiary_id)s
-            ;
-        """
-
-        # Need to verify wheter the application is already approved?
-        application_approval_check_sql: str = """
-            select 
-                1
-            from 
-                approved_applications
-            where 
-                application_id = %(application_id)s
-            ;
-        """
-
-
-        create_approved_application_sql: str = """
-            insert into approved_applications(
-                application_id
-            )
-            values
-                (%(application_id)s)
-            ;
-        """
+    try:
 
         # Get a database connection.
         conn: connection = db.getconn()
         cur: cursor = conn.cursor()
 
-        try:
-            # Check for previous approval of an application.
-            cur.execute(application_approval_check_sql, vars)
-            previous_approval = cur.fetchone()
+        # Check whether the application is already verified.
+        application_verification_sql: str = """
+            select 
+                is_verified::boolean 
+            from 
+                financial_assistance_applications as f
+            where 
+                f.id = %(application_id)s
+            ;
+        """ 
+        cur.execute(application_verification_sql, vars = {"application_id": application_verification_schema.application_id})
+        verification_status = cur.fetchone()
+        # print(f"The application verification status is {verification_status}")
 
-            if previous_approval:
+        if verification_status["is_verified"]:
+            context.update({
+                "message": "Application Already Processed/Verified.",
+                "message_type": "Info"
+            })
+            return templates.TemplateResponse("message.html", context)
+        
+        # Create a application verification record.
+        create_application_verification_sql: str = """
+            update 
+                financial_assistance_applications
+            set 
+                is_verified = true,
+                verified_by = %(verifier_id)s,
+                verified_at = now(),
+                remarks = %(remarks)s,
+                reason_for_rejection = %(reason_for_rejection)s,
+                conclusion = %(conclusion)s
+            where 
+                id = %(application_id)s
+            ;
+        """
+        vars: dict = application_verification_schema.model_dump()
+        vars.update({"verifier_id": user.id})
+        cur.execute(create_application_verification_sql, vars)
+
+
+        if application_verification_schema.conclusion == "accept":
+
+            # check for application approval accidentaly before.
+            application_approval_check_sql: str = """
+                select 
+                    1
+                from 
+                    approved_applications
+                where 
+                    application_id = %(application_id)s
+                ;
+            """
+            vars = {"application_id": application_verification_schema.application_id}
+            cur.execute(application_approval_check_sql, vars)
+            application_approval_status = cur.fetchone()
+
+            print(f"Tha application approval status is {application_approval_status}")
+            if application_approval_status:
                 context.update({
-                    "message": "Oops!, Application already processed.",
-                    "message_type": "Error"
+                    "message": "Application already approved.",
+                    "message_type": "Info"
                 })
                 return templates.TemplateResponse("message.html", context)
-
-            # Update application status.
-            cur.execute(update_application_status_sql, vars)
-            # Update remarks field.
-            cur.execute(update_personal_details_sql, vars)
-            # cur.execute(update_personal_details_sql, remarks_update_vars)
-            # Create application approve record.
-            cur.execute(create_approved_application_sql, vars)
-            # cur.execute(create_approved_application_sql, application_create_vars)
-            # Save the changes.
-            conn.commit()
         
-        except Exception as e:
-            conn.rollback()
-            print(f"Error occured during inserting the record: {str(e)}")
-            raise e 
-
-        finally:
-            cur.close()
-            db.putconn(conn)
-    
-        context.update({
-            "message": "Application approved successfully", 
-            "message_type": "Info"
-        })
-
-        return templates.TemplateResponse("message.html", context)
-
-
+            # Create application approval.
+            application_approval_sql: str = """
+                insert into approved_applications(application_id)
+                    values(%(application_id)s);
+            """
+            cur.execute(application_approval_sql, vars)
+        conn.commit()
             
+    except Exception as e:
+        conn.rollback()
+        print(f"Error occur during application verification: {str(e)}")
+        raise e
+    
+    finally:
+        cur.close()
+        db.putconn(conn)
+
+    message_dict: dict = {"accept": "Application approved succesfully", "reject": "Application rejected succesfully"}
+
+    context.update({"message": message_dict[application_verification_schema.conclusion], "message_type": "Info"})
+
+    return templates.TemplateResponse("message.html", context)
+
+
+# @router.get("/application/explore/{beneficiary_id}")
+# def get_application(
+#     request: Request,
+#     beneficiary_id: int,
+#     application_period_id: int,
+#     user: schemas.TokenData = Depends(get_current_admin_or_volunteer),
+# ):
+    
+#     # Need to write the logic to detect unexisting beneficiary id 
+#     # and application_period id.
+    
+#     sql: str = """
+#         select 
+#             f.id, f.beneficiary_id, per.full_name, per.phone_num,  
+#             c.degree, c.course, c.department, edu.college_name,  
+#             f.application_period_id, f.beneficiary_status, f.parental_status, 
+#             f.total_annual_family_income, f.house_status, f.reason_for_expecting_financial_assistance, 
+#             f.special_consideration, f.have_failed_in_any_subject_in_last_2_sem, f.latest_sem_perc, f.previous_sem_perc,
+#             f.difference_in_sem_perc, f.current_semester, per.remarks, ap.academic_year, ap.semester, f.applied_at, f.is_verified,
+#             f.verified_by, v.full_name as verifier_name, f.verified_at, f.reason_for_rejection, f.conclusion,
+#             s.full_name as current_sponsor_name, s.location as sponsor_location,
+#             s.country as sponsor_country, s.phone_num as sponsor_phone_num,
+#             aap.amount as contribution,
+#             lag(s.full_name) over(partition by f.beneficiary_id order by f.application_period_id) as previous_sponsor_name,
+#             lag(aap.amount) over(partition by f.beneficiary_id order by f.application_period_id) as previous_contribution,
+#             aap.transfered_at
+            
+#         from 
+#             financial_assistance_applications as f
+#         join 
+#             beneficiary_personal_details as per
+#         on 
+#             f.beneficiary_id = per.id 
+#         join 
+#             beneficiary_educational_details as edu
+#         on 
+#             f.beneficiary_id = edu.id
+#         join 
+#             courses as c 
+#         on 
+#             c.id = edu.course_id
+#         join 
+#             application_periods as ap
+#         on 
+#             ap.id = f.application_period_id
+#         left join 
+#             approved_applications as aap
+#         on 
+#             aap.application_id = f.id
+#         left join 
+#             sponsors as s
+#         on 
+#             s.id = aap.sponsor_id
+#         left join 
+#             admin_volunteers as v
+#         on 
+#             v.id = f.verified_by
+#         where 
+#             f.beneficiary_id = %(beneficiary_id)s and 
+#             f.application_period_id <= %(application_period_id)s
+#         order by 
+#             f.application_period_id
+#     """
+
+#     # Fetching all application before this current application_period.
+#     vars: dict = {"beneficiary_id": beneficiary_id, "application_period_id": application_period_id}
+#     application_data = execute_sql_select_statement(sql, vars)
+
+#     if not application_data:
+#         return "No records to display."
+
+#     applications_df = pd.DataFrame(application_data)
+
+#     # Change the str into list[str] for special consideration column
+#     applications_df["special_consideration"] = applications_df["special_consideration"].str.strip().str.split(".")
+    
+#     general_details_columns: list[str] = ["beneficiary_id", "full_name", "degree", "course", "department", "college_name", "phone_num"]
+    
+#     full_details: dict = dict()
+
+#     general_details: dict = applications_df[general_details_columns].iloc[0].to_dict()
+
+    
+#     # Grab two applications that is current and previous applications[one step back]
+#     required_columns: list[str] = [col for col in applications_df.columns if col not in general_details]
+#     application_details = applications_df[required_columns].tail(2).to_dict("records")
+
+
+#     # Select all previous applications and the remarks, conclusion and verifier name
+#     history_columns: list[str] = ["id", "application_period_id", "academic_year", "semester", "remarks", "conclusion", "reason_for_rejection", "verifier_name", "contribution", "current_sponsor_name", "sponsor_phone_num"]
+#     history_of_applications = applications_df[history_columns].iloc[::-1].to_dict("records")[1:]
+
+#     full_details.update({
+#         "general_details": general_details,
+#         "history_of_applications": history_of_applications,
+#         "application_details": application_details
+#     })
+
+#     # return full_details
+#     return templates.TemplateResponse("application_view.html", {"request": request, "data": full_details})
+    
